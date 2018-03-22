@@ -1,0 +1,35 @@
+{
+  "name": "jobs-crawler",
+  "version": "1.0.0",
+  "description": "Jobs list for ejobs and bestjobs based on a search query. Prevents duplicate content and the ability to remove files from the search.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Slitthe/jobs-crawler.git"
+  },
+  "keywords": [
+    "crawler",
+    "jobs",
+    "ejobs",
+    "bestjobs",
+    "html",
+    "parse",
+    "http",
+    "request"
+  ],
+  "author": "Silviu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Slitthe/jobs-crawler/issues"
+  },
+  "homepage": "https://github.com/Slitthe/jobs-crawler#readme",
+  "dependencies": {
+    "ejs": "^2.5.7",
+    "express": "^4.16.3",
+    "mongoose": "^5.0.11",
+    "request": "^2.85.0"
+  }
+}
