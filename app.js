@@ -1,70 +1,93 @@
 var   express = require('express'),
-      app = express();
-      mongoose = require('mongoose');
-      request = require('request');
+		app = express();
+		mongoose = require('mongoose');
+		request = require('request');
 
-   
+	
 
 // App logic
 var getUrls = function() {
-   var urls = {
-      ejobs: 'https://www.ejobs.ro/locuri-de-munca/',
-      bestjobs: 'https://www.bestjobs.eu/ro/locuri-de-munca/relevant/',
-   }
-   var reqUrls = function(page, query, city, site) {
-      var url = '';
-      query = encodeURI(query);
-      if(site === 'ejobs') {
-         url = urls.bestjobs + page + '?keyword=' + query + '&location=' + city;
-      } else {
-         url = urls.ejobs + city + '/' + query + '/page' + page + '/'  
-      }
-      return url;
-   };
+	var urls = {
+		ejobs: 'https://www.ejobs.ro/locuri-de-munca/',
+		// https://www.ejobs.ro/locuri-de-munca/brasov/web%20developer/page2/
+		bestjobs: 'https://www.bestjasdasobs.eu/ro/locuri-de-munca/relevant/',
+		// https://www.bestjobs.eu/ro/locuri-de-munca/relevant/3?keyword=web%20developer&location=brasov
+	}
+	var reqUrls = function(page, query, city, site) {
+		var url = '';
 
-   return {
-      reqUrls: reqUrls
-   }
+		site = site.toLowerCase();
+		query = encodeURI(query);
+
+		if(site === 'ejobs') {
+			url = urls.ejobs + city + '/' + query + '/page' + page + '/';
+		} else {
+			url = urls.bestjobs + page + '?keyword=' + query + '&location=' + city;
+		}
+		return url;
+	};
+
+	return reqUrls;
 }();
 
-var parsers = function() {
-   var ejobs = function(htmlString) {
-      var hrefExp = /href=('|")(.*?)('|")/gi;
-      var nameExp = />(.*?)(<\/a>)/gi;
-      var items = htmlString.match(/datalayeritemlink.*?>(.*?)(<\/a>)/gi);
-      items = items.map(function (curr) {
-         curr.replace();
-         var href = curr.match(hrefExp)[0];
-         href = href.replace(hrefExp, '$2')
-         var name = curr.match(nameExp)[0];
-         name = name.replace(nameExp, '$1');
-         return { name: name, href: href };
-      });
-      return items;
-   };
+var parse = function() {
+	var expressions = {
+		removeWs: /\n|\r/gim, 
+		ejobs: {
+			href: /href="(.*?)"/gi,
+			name: />(.*?)<\/a>/gi,
+			items: /dataLayerItemLink.*?<\/a>/gi
+		},
+		bestjobs: {
+			href: /href="(.*?)\?/gi,
+			name: /<strong.*?>(.*?)<\/strong>/gi,
+			items: /job-title.*?<\/a>/gi
+		}
+	}
 
-   var bestjobs = function(htmlString) {
-      htmlString = data.replace(/(\n|\r)/gim, ' ');
+		// DOESN'T WORK
+	var parseData = function(data) {
+			var htmlString = data.str;
+			var site = data.site;
+			
+			// Expressions
+			htmlString = htmlString.replace(expressions.removeWs, ' ');
+			var exp = expressions[site];
+			console.log(exp);
+			
+			// remove whitespace
+			htmlString = htmlString.replace(/\n|\r/gim, ' ');
 
-      var hrefExp = /href=('|")(.*?)\?/gi;
-      var nameExp = /<strong>(.*?)(<\/strong>)/gi;
+			// Search for jobs posts
+			items = htmlString.match(exp.items);
 
-      var items = data.match(/job-title.*?(<\/a>)/gim);
-      items = items.map(function (curr) {
-         var href = curr.match(hrefExp)[0];
-         href = href.replace(hrefExp, '$2')
-         var name = curr.match(nameExp)[0];
-         name = name.replace(nameExp, '$1');
-         return { name: name, href: href };
-      });
-      return items;
-   };
+			if (items) {
+					items = items.map(function (curr) {
+							var href = curr.match(exp.href)[0];
+							href = href.replace(exp.href, '$1')
+							var name = curr.match(exp.name)[0];
+							name = name.replace(exp.name, '$1');
+							return { name: name, href: href };
+					});
+			}
 
-   var parse = function(htmlStr) {
-      // Gets rid of new lines to 'match' properly
-      htmlStr = htmlStr.replace(/(\n|\r)/gim, ' ');
-   }
-}
+			return items;
+	};
+
+	return parseData;
+}();
+
+request(getUrls(1, 'web developer', 'brasov', 'bestjobs'), function(err, data) {
+	if(!err) {
+			console.log(getUrls(1, 'web developer', 'brasov', 'bestjobs'));
+		
+		console.log(parse({
+			str: data.body,
+			site: 'bestjobs'
+		}));
+
+	}
+})
 
 
 
@@ -72,12 +95,12 @@ var parsers = function() {
 
 // Routes
 app.get('/', function(req, res) {
-   // the list of jobs should appear here
+	// the list of jobs should appear here
 });
 
 // express listening start
 app.listen(3000, function() {
-   console.log('The app has started');
+	console.log('The app has started');
 });
 
 
