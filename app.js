@@ -144,8 +144,8 @@ function infiniteRepeat(site, places, queries,i , j, page, tryCount) {
 
 
 
-
-// models['bestjobs'].find({}, function(err, data) {
+// // DUPLICATE CHECKER
+// models['ejobs'].find({}, function(err, data) {
 // 	console.log(data.length);
 // 	for(let i = 0; i < data.length - 1; i ++) {
 // 		for(let j = i + 1; j < data.length; j++) {

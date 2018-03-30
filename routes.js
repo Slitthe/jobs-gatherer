@@ -6,7 +6,7 @@ var routes = function(app) {
      res.render('home', {data: data});
    });
 
-   app.get('/results/:site', function(req, res) {
+   app.get('/:site', function(req, res) {
       const site = req.params.site;
       if(models[site]) {
          models[site].find({}, function(err, results) {
@@ -25,6 +25,10 @@ var routes = function(app) {
       }
 
   //  });
+  });
+
+  app.put(':site/:id', function(req, res) {
+
   });
 }
 
