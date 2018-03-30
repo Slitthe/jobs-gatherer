@@ -21,7 +21,6 @@ var parse = function () {
       // Expressions
       htmlString = htmlString.replace(expressions.removeWs, ' ');
       var exp = expressions[site];
-      console.log(exp);
 
       // remove whitespace
       htmlString = htmlString.replace(/\n|\r/gim, ' ');

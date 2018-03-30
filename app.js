@@ -6,33 +6,20 @@ const   express = require('express'),
 		parse = require('./parser'),
 		getUrls = require('./urlConstructor'),
 		models = require('./models'),
-		data = require('./data');
+		data = require('./data'),
+		fs = require('fs');
 
 
 
 mongoose.connect('mongodb://localhost/jobs_crawler');
 
 
-
-
+function infiniteRepeat(site, places, queries,i , j, page, tryCount) {
 	
-
-// App logic
-
-
-
-
-
-
-
-
-
-
-
-// Acts like 2 nested for loops but with DELAY and with REPEAT
-// Will refractor it later so it won't look so spaghetiiy
-function infiniteRepeat(site, places, queries,i , j, page) {
+	tryCount = tryCount || 1;
+	console.log('------------- |||   ' + 'Website: ' + site, '|||  City: ' + places[j], '|||   Keywords : ' + queries[i], '|||  Page: :' + page, '||||   Try count: ' + tryCount);				
 	var increment = function () {
+		// Analogous to one iteration of a nested 'for' loop
 		if (i < queries.length - 1) {
 			i++
 		} else {
@@ -44,80 +31,121 @@ function infiniteRepeat(site, places, queries,i , j, page) {
 			i = 0;
 		}
 	};
-	console.log(places[j], queries[i], page);
 
-	let url = getUrls(page, queries[i], places[j], site);
-
+	let url = getUrls(page, queries[i], places[j], site); // req URL
 
 	request(url, function(err, response, body) {
-		if(!err && response.statusCode === 200) { //no error 
+		if(!err && response.statusCode === 200) {
+			// =================
+			// SUCCESFUL REQ
+			// =================
 			let parsed = parse({
 				str: body,
 				site: site
-			});
+			}); // parsed HTML request to extract the jobs listing (if any)
 
 			
 
-			if(parsed) { // results found
+			if(parsed) { // if no jobs listing, parsed will be null ( it used String.prototype.match method )
+				// =====================
+				// SUCCESFUL REQ & 1 >= RESULTS
+				// =====================
 				models[site].find({}, function(err, data) {
-					console.log(data.length, parsed.length);
+					// Gets data about the listings in the DB to compare duplication
 					if(!err) {
-						
 						parsed.forEach(function (current) {
-							
-							if (!helpers.duplicateChecker(current, data, 'url') ) {
+							if (!helpers.duplicateChecker(current, data, 'url') ) { // doesn't add the listing if it already exists in the DB
 								models[site].create({
 									url: current.url,
 									title: current.title,
 									city: places[i]
-								}, function (err, data) {
 								});
 							}
 						});						
 					}
 
-				})
+				});
 
 
 
 				console.log('Results found');
-				page++;
+				page++; // increments the page if results were found
 				setTimeout(function () {
 					infiniteRepeat(site, places, queries, i, j, page);
-				}, 7000);
-			} else { // no results found
-				console.log('No results found', queries[i]);
+				}, helpers.randomRange(400000, 800000));
+			} else { 
+				// ================
+				// NO RESULTS FOUND
+				// ================
+				console.log('No results found');
 
-				increment();
+				increment(); // tries another query and/or location
 				setTimeout(function () {
 					infiniteRepeat(site, places, queries, i, j, 1);
 				}, helpers.randomRange(400000, 800000));
 			}
 
-		} else { // request error
+		} else {
+			// ================
+			// REQUEST ERROR
+			// ================
+
+			// SHOULD add a sort of ('if there was a request error, try again at least 3 more times, and only then increment the values)
+
 			console.log('request error');
-			increment();
+			if(tryCount < 3) {
+				tryCount++;
+			} else {
+				tryCount = 1;
+				increment();
+			}
 			setTimeout(function () {
-				infiniteRepeat(site, places, queries, i, j);
+				infiniteRepeat(site, places, queries, i, j, 1, tryCount);
 			}, helpers.randomRange(400000, 800000));
 		}
 	});
 
 }
-
+// Separate function calls are required for different sites
+// Would be ineffective to loop through the sites as well, and too compicated to add the logic to run in parallel when the alternative is just calling the function again with different values
 infiniteRepeat('bestjobs', data.cities, data.keywords, 0, 0, 1);
 
-models['bestjobs'].find({}, function(err, data) {
-	console.log(data.length);
-	for(let i = 0; i < data.length - 1; i ++) {
-		for(let j = i + 1; j < data.length; j++) {
-			if(data[i].url === data[j].url) {
-				console.log('duplicate found');
-				break;
-			}
-		}
-	}
-});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// models['bestjobs'].find({}, function(err, data) {
+// 	console.log(data.length);
+// 	for(let i = 0; i < data.length - 1; i ++) {
+// 		for(let j = i + 1; j < data.length; j++) {
+// 			if(data[i].url === data[j].url) {
+// 				console.log('duplicate found');
+// 				break;
+// 			}
+// 		}
+// 	}
+// });
 
 
 

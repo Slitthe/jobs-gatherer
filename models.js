@@ -4,7 +4,12 @@ const data = require('./data'),
 var jobSchema = new mongoose.Schema({
    url: String,
    title: String,
-   city: String
+   city: String,
+   filterCat: {
+         type: String,
+         default: 'default'
+         // other possible values: 'saved', 'deleted', affected front end visibility only
+   }
 });
 
 function createModels(sites, schema) {
