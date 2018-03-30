@@ -27,8 +27,11 @@ var routes = function(app) {
   //  });
   });
 
-  app.put(':site/:id', function(req, res) {
-
+  app.put('/:site', function(req, res) {
+    let site = req.params.site;
+    if(models[site]) {
+      console.log('site exists')
+    }
   });
 }
 

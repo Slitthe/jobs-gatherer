@@ -8,10 +8,13 @@ const   express = require('express'),
 		models = require('./models'),
 		data = require('./data'),
 		routes = require('./routes'),
-		ejs = require('ejs');
+		ejs = require('ejs'),
+		methodOverride = require('method-override');
 
 app.set('view engine', 'ejs');
 app.use( express.static(__dirname + '/public') );
+app.use( methodOverride('_method') );
+
 
 routes(app);
 
