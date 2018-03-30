@@ -1,0 +1,26 @@
+.result-item {
+   display: block;
+   width: 100%;
+   padding: 0.75rem 1.25rem;
+   transition-property: background;
+   transition-duration: 0.05s;
+   box-sizing: border-box;
+}
+
+.list-group-item {
+   padding: 0;
+}
+
+.result-item:hover {
+   background: rgba(82%, 82%, 82%, 0.7);
+}
+.result-item:active {
+   background: rgba(82%, 82%, 82%, 0.9);
+}
+
+.btn-group {
+   right: 0;
+   top: 5px;
+   bottom: 5px;
+   z-index: 999;
+}

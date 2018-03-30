@@ -27,7 +27,7 @@
   },
   "homepage": "https://github.com/Slitthe/jobs-crawler#readme",
   "dependencies": {
-    "ejs": "^2.5.7",
+    "ejs": "^2.5.8",
     "express": "^4.16.3",
     "mongoose": "^5.0.11",
     "request": "^2.85.0"
