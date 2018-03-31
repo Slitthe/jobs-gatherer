@@ -37,25 +37,30 @@ var dataSplitter = function(items) {
 };
 
 var removeExpired = function(models, sites) {
+
    sites.forEach(function(site) {
       console.log(site);
+
       models[site].find({}, function(err, results) {
-         console.log(results.length);
          if(!err) {
+            console.log(results.length);
+            var l = 0;
             results.forEach(function(result) {
-               if(results.filterCat !== 'saved') {
-                  console.log(result.updateDate.getTime());
-                  
+               if(result.filterCat !== 'saved') {
+                  l++;
                   if (Date.now() >= result.updateDate.getTime() + 36000) {
-                     console.log(result._id);
-                     models[site].findByIdAndRemove(result._id);
-                     console.log('Expired item removed');
+                     result.remove();
+                     // result.save();
                   }
                }
             });
+            console.log(l);
          }
+
       });
+
    });
+
 };
 
 

@@ -18,6 +18,10 @@
    background: rgba(82%, 82%, 82%, 0.9);
 }
 
+.result-item:focus {
+   background: rgba(87%, 87%, 87%, 0.95);
+}
+
 .btn-group {
    right: 5px;
    top: 5px;
@@ -28,3 +32,4 @@
 .result-type {
    margin: 50px 0;
 }
+

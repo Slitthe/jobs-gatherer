@@ -44,8 +44,19 @@ function infiniteRepeat(site, places, queries,i , j, page, tryCount) {
 				j = 0;
 			}
 			i = 0;
-		}
-	};
+      }
+   };
+   
+   models.value.findOne({site: site}, function(err, data) {
+      if(!err) {
+         data.keyword = i;
+         data.city = j;
+         data.page = page;
+         data.save();
+      } else {
+
+      }
+   })
 
 	let url = getUrls(page, queries[i], places[j], site); // req URL
 
@@ -129,8 +140,19 @@ function infiniteRepeat(site, places, queries,i , j, page, tryCount) {
 }
 // Separate function calls are required for different sites
 // Would be ineffective to loop through the sites as well, and too compicated to add the logic to run in parallel when the alternative is just calling the function again with different values
-// infiniteRepeat('ejobs', data.cities, data.keywords, 0, 0, 1);
+infiniteRepeat('ejobs', data.cities, data.keywords, 0, 0, 1);
 infiniteRepeat('bestjobs', data.cities, data.keywords, 0, 0, 1);
+
+
+// ejobs --> city: indexNumber, keyword: indexNumber, pageNumber: number
+
+/* models['ejobs'].findOne({}, function(err, data) {
+      if(!err) {
+         infiniteRepeat('ejobs', data.cities[data.city], data.keywords[data.keyword], data.pageNumber);
+      } else {
+         infiniteRepeat('ejobs', data.cities, data.keywords, 0, 0, 1);
+      }
+}); */
 
 
 
