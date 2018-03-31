@@ -1,6 +1,8 @@
 const keywords = [
    'web developer',
    'front end',
+];
+/* 
    'front end developer',
    'css',
    'css3',
@@ -17,7 +19,7 @@ const keywords = [
    'programator',
    'it',
    'dezvoltator'
-];
+*/
 
 // The cities to search in
 const cities = [

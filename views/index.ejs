@@ -6,7 +6,7 @@
          <% results.forEach(function(result) { %>
             <li class='list-group-item row position-relative'>
                <a class='col-xs-8 result-item' href='<%= result.url %>' target='_blank'><%= result.title %></a>
-               <div class="position-absolute btn-group" role="group" aria-label="Basic example">
+               <div class="position-absolute btn-group" role="group" aria-label="Basic example" data-id='<%= result._id%>'>
                   <button type="button" class="px-3 btn btn-success" title='Save listing'>
                      <i class='fa fa-floppy-o'></i>
                   </button>

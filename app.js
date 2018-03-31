@@ -2,25 +2,27 @@ const   express = require('express'),
 		app = express(),
 		mongoose = require('mongoose'),
 		request = require('request'),
+		methodOverride = require('method-override'),
+		bodyParser = require('body-parser'),
+		ejs = require('ejs'),
 		helpers = require('./helpers'),
 		parse = require('./parser'),
 		getUrls = require('./urlConstructor'),
 		models = require('./models'),
 		data = require('./data'),
-		routes = require('./routes'),
-		ejs = require('ejs'),
-		methodOverride = require('method-override');
+		routes = require('./routes');
 
 app.set('view engine', 'ejs');
 app.use( express.static(__dirname + '/public') );
 app.use( methodOverride('_method') );
+app.use( bodyParser.urlencoded({extended: true}) );
 
 
-routes(app);
+// routes(app);
 
-app.listen(3000, function() {
-	console.log('EXPRESS started listening');
-});
+// app.listen(3000, function() {
+// 	console.log('EXPRESS started listening');
+// });
 
 
 
@@ -65,27 +67,25 @@ function infiniteRepeat(site, places, queries,i , j, page, tryCount) {
 				// =====================
 				models[site].find({}, function(err, data) {
 					// Gets data about the listings in the DB to compare duplication
-					if(!err) {
-						parsed.forEach(function (current) {
-							if (!helpers.duplicateChecker(current, data, 'url') ) { // doesn't add the listing if it already exists in the DB
-								models[site].create({
-									url: current.url,
-									title: current.title,
-									city: places[i]
-								});
-							}
-						});						
+						if(data){
+							parsed.forEach(function (current) {
+								if (!helpers.duplicateChecker(current, data, 'url') ) { // doesn't add the listing if it already exists in the DB
+									models[site].create({
+										url: current.url,
+										title: current.title,
+										city: places[i]
+									});
+								}
+							});						
 					}
-
 				});
 
 
 
-				console.log('Results found');
 				page++; // increments the page if results were found
 				setTimeout(function () {
 					infiniteRepeat(site, places, queries, i, j, page);
-				}, helpers.randomRange(400000, 800000));
+				}, helpers.randomRange(300000, 500000));
 			} else { 
 				// ================
 				// NO RESULTS FOUND
@@ -95,7 +95,7 @@ function infiniteRepeat(site, places, queries,i , j, page, tryCount) {
 				increment(); // tries another query and/or location
 				setTimeout(function () {
 					infiniteRepeat(site, places, queries, i, j, 1);
-				}, helpers.randomRange(400000, 800000));
+				}, helpers.randomRange(300000, 500000));
 			}
 
 		} else {
@@ -114,14 +114,14 @@ function infiniteRepeat(site, places, queries,i , j, page, tryCount) {
 			}
 			setTimeout(function () {
 				infiniteRepeat(site, places, queries, i, j, 1, tryCount);
-			}, helpers.randomRange(400000, 800000));
+			}, helpers.randomRange(300000, 500000));
 		}
 	});
 
 }
 // Separate function calls are required for different sites
 // Would be ineffective to loop through the sites as well, and too compicated to add the logic to run in parallel when the alternative is just calling the function again with different values
-// infiniteRepeat('bestjobs', data.cities, data.keywords, 0, 0, 1);
+// infiniteRepeat('ejobs', data.cities, data.keywords, 0, 0, 1);
 
 
 
@@ -148,7 +148,7 @@ function infiniteRepeat(site, places, queries,i , j, page, tryCount) {
 
 
 // // DUPLICATE CHECKER
-// models['ejobs'].find({}, function(err, data) {
+// models['bestjobs'].find({}, function(err, data) {
 // 	console.log(data.length);
 // 	for(let i = 0; i < data.length - 1; i ++) {
 // 		for(let j = i + 1; j < data.length; j++) {

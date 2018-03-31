@@ -28,6 +28,8 @@ var routes = function(app) {
   });
 
   app.put('/:site', function(req, res) {
+    console.log(req.body);
+
     let site = req.params.site;
     if(models[site]) {
       console.log('site exists')
