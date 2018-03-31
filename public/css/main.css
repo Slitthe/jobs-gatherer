@@ -24,3 +24,7 @@
    bottom: 5px;
    z-index: 999;
 }
+
+.result-type {
+   margin: 50px 0;
+}

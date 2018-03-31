@@ -2,20 +2,69 @@
    <div class='container my-5'>
       <a class='btn btn-link' href='/'>‹‹ Go Home</a>
       <h1><%= site.toUpperCase() %></h1>
-      <ul class='list-group'>
-         <% results.forEach(function(result) { %>
-            <li class='list-group-item row position-relative'>
-               <a class='col-xs-8 result-item' href='<%= result.url %>' target='_blank'><%= result.title %></a>
-               <div class="position-absolute btn-group" role="group" aria-label="Basic example" data-id='<%= result._id%>'>
-                  <button type="button" class="px-3 btn btn-success" title='Save listing'>
-                     <i class='fa fa-floppy-o'></i>
-                  </button>
-                  <button type="button" class="px-3 btn btn-danger" title='Delete listing'>
-                     <i class='fa fa-trash'></i>
-                  </button>
-               </div>
-            </li>
-         <% })%>
-      </ul>
+
+      <div class='result-type'>
+         <h2>Saved Results</h2>
+         <ul class='list-group'>
+            <% results.saved.forEach(function(result) { %>
+               <li class='list-group-item row position-relative'>
+                  <a class='col-xs-8 result-item' href='<%= result.url %>' target='_blank'>
+                     <%= result.title %>
+                  </a>
+                  <div class="position-absolute btn-group func-btns" role="group" aria-label="Basic example" data-id='<%= result._id%>'>
+                     <button type="button" class="px-3 btn btn-danger delete-btn" title='Delete listing'>
+                        <i class='fa fa-trash'></i>
+                     </button>
+                  </div>
+               </li>
+            <% })%>
+         </ul>
+      </div>
+      
+
+      <div class='result-type'>
+         <h2>Results</h2>
+         <ul class='list-group'>
+            <% results.default.forEach(function(result) { %>
+               <li class='list-group-item row position-relative'>
+                  <a class='col-xs-8 result-item' href='<%= result.url %>' target='_blank'>
+                     <%= result.title %>
+                  </a>
+                  <div class="position-absolute btn-group func-btns" role="group" aria-label="Basic example" data-id='<%= result._id%>'>
+                     <button type="button" class="px-3 btn btn-success save-btn" title='Save listing'>
+                        <i class='fa fa-floppy-o'></i>
+                     </button>
+                     <button type="button" class="px-3 btn btn-danger delete-btn" title='Delete listing'>
+                        <i class='fa fa-trash'></i>
+                     </button>
+                  </div>
+               </li>
+            <% })%>
+         </ul>
+      </div>
+      
+
+      <div class='result-type'>
+         <h2>Deleted Results</h2>
+         <button class='toggle-hidden-next btn btn-secondary'>&#9660</button>
+         <ul class='list-group deleted-results d-none'>
+            <% results.deleted.forEach(function(result) { %>
+               <li class='list-group-item row position-relative'>
+                  <a class='col-xs-8 result-item' href='<%= result.url %>' target='_blank'>
+                     <%= result.title %>
+                  </a>
+                  <div class="position-absolute btn-group func-btns" role="group" aria-label="Basic example" data-id='<%= result._id%>'>
+                     <button type="button" class="px-3 btn btn-success save-btn" title='Save listing'>
+                        <i class='fa fa-floppy-o'></i>
+                     </button>
+                     <button type="button" class="px-3 btn btn-secondary restore-btn" title='Delete listing'>
+                        <i class='fa fa-undo'></i>
+                     </button>
+                  </div>
+               </li>
+            <% })%>
+         </ul>
+      </div>
+      
    </div>
 <% include partials/footer %>

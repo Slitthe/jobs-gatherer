@@ -18,11 +18,11 @@ app.use( methodOverride('_method') );
 app.use( bodyParser.urlencoded({extended: true}) );
 
 
-// routes(app);
+routes(app);
 
-// app.listen(3000, function() {
-// 	console.log('EXPRESS started listening');
-// });
+app.listen(3000, function() {
+	console.log('EXPRESS started listening');
+});
 
 
 
@@ -75,7 +75,15 @@ function infiniteRepeat(site, places, queries,i , j, page, tryCount) {
 										title: current.title,
 										city: places[i]
 									});
-								}
+								} else {
+                           models[site].findOne({url: current.url}, function(err, data) {
+                              if(!err) {
+                                 data.expiryDate = Date.now();
+                                 data.save();
+                              }
+                           })
+                        }
+                        
 							});						
 					}
 				});
@@ -122,6 +130,8 @@ function infiniteRepeat(site, places, queries,i , j, page, tryCount) {
 // Separate function calls are required for different sites
 // Would be ineffective to loop through the sites as well, and too compicated to add the logic to run in parallel when the alternative is just calling the function again with different values
 // infiniteRepeat('ejobs', data.cities, data.keywords, 0, 0, 1);
+infiniteRepeat('bestjobs', data.cities, data.keywords, 0, 0, 1);
+
 
 
 

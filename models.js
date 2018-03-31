@@ -1,6 +1,8 @@
 const data = require('./data'),
       mongoose = require('mongoose');
 
+
+
 var jobSchema = new mongoose.Schema({
    url: String,
    title: String,
@@ -9,6 +11,10 @@ var jobSchema = new mongoose.Schema({
          type: String,
          default: 'default'
          // other possible values: 'saved', 'deleted', affected front end visibility only
+   },
+   updateDate: {
+      type: Date,
+      default: new Date
    }
 });
 
