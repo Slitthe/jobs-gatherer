@@ -1,9 +1,10 @@
+/* Mongoose related data (schemas and models) */
 const data = require('./data'),
       mongoose = require('mongoose');
 
 
 
-var jobSchema = new mongoose.Schema({
+var siteSchema = new mongoose.Schema({
    url: String,
    title: String,
    city: String,
@@ -34,10 +35,10 @@ var valueSchema = new mongoose.Schema({
    site: String
 });
 
-function createModels(sites, schema) {
+function createModels(sites, schema) { // creates a model for each site, following the 'siteSchema' schema 
    var models = {};
    for (let i = 0; i < sites.length; i++) {
-      let modelName = sites[i][0].toUpperCase() + sites[i].substring(1);
+      let modelName = sites[i][0].toUpperCase() + sites[i].substring(1); // uppercases the first letter of the site
       models[sites[i]] = mongoose.model(modelName, schema);
    }
    return models;
@@ -45,16 +46,6 @@ function createModels(sites, schema) {
 var models = createModels(data.sites, jobSchema);
 models.value = mongoose.model('Value', valueSchema);
 
-
-data.sites.forEach(function(site) {
-   models.value.findOne({site: site}, function(err, data) {
-      if(!err){
-         models.value.create({ site: site });
-      } else {
-         console.log('Initial values failed')
-      }
-   })
-});
 
 
 module.exports = models;

@@ -5,6 +5,20 @@
 
       <div class='result-type' data-category='saved'>
          <h3 class='text-center'>Saved</h3>
+
+         <% if(!Object.keys(results.saved).length){ %>
+            <% data.cities.forEach(function(city){ %>
+               <ul class='list-group' data-city='<%= city %>'>
+                  <li class='list-group-item row text-center py-2 text-muted'>
+                      <h4>
+                        <%= city %>
+                        (<span class='counter'>
+                           0
+                        </span>)</h4>
+                  </li>
+               </ul>
+            <%})%>
+         <%}%>
          <% Object.keys(results.saved).forEach(function(key) { %>
             <ul class='list-group' data-city='<%= key%>'>
                <li class='list-group-item row text-center py-2 text-muted' >
@@ -32,6 +46,21 @@
 
       <div class='result-type' data-category='default'>
          <h3 class='text-center'>Results</h3>
+
+         <% if(!Object.keys(results.default).length){ %>
+            <% data.cities.forEach(function(city){ %>
+               <ul class='list-group' data-city='<%= city %>'>
+                  <li class='list-group-item row text-center py-2 text-muted'>
+                     <h4>
+                        <%= city %>
+                           (
+                           <span class='counter'>
+                              0
+                           </span>)</h4>
+                  </li>
+               </ul>
+            <%})%>
+         <%}%>
          <% Object.keys(results.default).forEach(function(key) { %>
             <ul class='list-group' data-city='<%= key%>'>
                <li class='list-group-item row text-center py-2 text-muted'>
@@ -58,8 +87,24 @@
          <% }) %>
       </div>
 
+
+
+
       <div class='result-type' data-category='deleted'>
-            <p class='text-center lead'>Deleted Results</p>
+         <p class='text-center lead'>Deleted Results</p>
+         
+            <% if(!Object.keys(results.deleted).length){ %>
+               <% data.cities.forEach(function(city){ %>
+                  <h4><%= city%></h4>
+                  <button class='toggle-hidden-next btn btn-secondary'>&#9660</button>
+                  <ul class='list-group' data-city='<%= city %>'>
+                     <li class='list-group-item row text-center py-2 text-muted'>
+                        <h4><%= city %>(<span class='counter'>0</span>)</h4>
+                     </li>
+                  </ul>
+               <%})%>
+            <%}%>
+
          <% Object.keys(results.deleted).forEach(function(key) { %>
             <h3 class='text-muted'>
                <%= key %>

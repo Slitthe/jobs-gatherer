@@ -1,22 +1,26 @@
+// Endpoint creator given the: query, city and page for a site
 var getUrls = function () {
+   // base urls
    var urls = {
       ejobs: 'https://www.ejobs.ro/locuri-de-munca/',
-      // https://www.ejobs.ro/locuri-de-munca/brasov/web%20developer/page2/
+      // Example: https://www.ejobs.ro/locuri-de-munca/brasov/web%20developer/page2/
       bestjobs: 'https://www.bestjobs.eu/ro/locuri-de-munca/relevant/',
-      // https://www.bestjobs.eu/ro/locuri-de-munca/relevant/3?keyword=web%20developer&location=brasov
+      // Example: https://www.bestjobs.eu/ro/locuri-de-munca/relevant/3?keyword=web%20developer&location=brasov
    }
    var reqUrls = function (page, query, city, site) {
       var url = '';
 
       site = site.toLowerCase();
-      query = encodeURI(query);
-
-      if (site === 'ejobs') {
-         url = urls.ejobs + city + '/' + query + '/page' + page + '/';
-      } else {
-         url = urls.bestjobs + page + '?keyword=' + query + '&location=' + city;
+      query = encodeURI(query); // make the keyword URL-friendly
+      var siteUrls = { // constructors
+         ejobs: function(){
+            return urls.ejobs + city + '/' + query + '/page' + page + '/';
+         },
+         bestjobs: function(){
+            return urls.bestjobs + page + '?keyword=' + query + '&location=' + city;
+         }
       }
-      return url;
+      return siteUrls[site](); // result of the constructor for the input 'site'
    };
 
    return reqUrls;

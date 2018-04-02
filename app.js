@@ -20,7 +20,7 @@ app.use( bodyParser.urlencoded({extended: true}) );
 
 routes(app);
 
-app.listen(4444, function() {
+app.listen(3333, function() {
 	console.log('EXPRESS started listening');
 });
 
@@ -30,9 +30,8 @@ mongoose.connect('mongodb://localhost/jobs_crawler');
 
 
 function infiniteRepeat(site, places, queries,i , j, page, tryCount) {
-	
 	tryCount = tryCount || 1;
-	console.log('------------- |||   ' + 'Website: ' + site, '|||  City: ' + places[j], '|||   Keywords : ' + queries[i], '|||  Page: :' + page, '||||   Try count: ' + tryCount);				
+	console.log(site, '-->  ' + places[j], ' --> ' + queries[i], ' --> (page): ' + page, ' -->Retry Count: ' + tryCount);				
 	var increment = function () {
 		// Analogous to one iteration of a nested 'for' loop
 		if (i < queries.length - 1) {
@@ -46,19 +45,21 @@ function infiniteRepeat(site, places, queries,i , j, page, tryCount) {
 			i = 0;
       }
    };
+   helpers.removeExpired(models, data.sites);
+   models.value.findOne({site: site}, function(err, data) {
+      if(!err && data) {
+         data.keyword = i;
+         data.city = j;
+         data.page = page;
+         data.save();
+      } else {
+         models.value.create({site: site});
+      }
+   });
+
+   let url = getUrls(page, queries[i], places[j], site); // req URL
    
-   // models.value.findOne({site: site}, function(err, data) {
-   //    if(!err) {
-   //       data.keyword = i;
-   //       data.city = j;
-   //       data.page = page;
-   //       data.save();
-   //    } else {
 
-   //    }
-   // });
-
-	let url = getUrls(page, queries[i], places[j], site); // req URL
 
 	request(url, function(err, response, body) {
 		if(!err && response.statusCode === 200) {
@@ -68,7 +69,8 @@ function infiniteRepeat(site, places, queries,i , j, page, tryCount) {
 			let parsed = parse({
 				str: body,
 				site: site
-			}); // parsed HTML request to extract the jobs listing (if any)
+         }); // parsed HTML request to extract the jobs listing (if any)
+         
 
 			
 
@@ -88,12 +90,15 @@ function infiniteRepeat(site, places, queries,i , j, page, tryCount) {
 									});
 								} else { // if it already exists, just 
                            models[site].findOne({url: current.url}, function(err, data) {
-                              if(!err) {
+                              if(!err && data) {
                                  data.updateDate = Date.now();
                                  data.save();
                               }
                            })
                         }
+                        
+                        
+                        
                         
 							});						
 					}
@@ -104,7 +109,7 @@ function infiniteRepeat(site, places, queries,i , j, page, tryCount) {
 				page++; // increments the page if results were found
 				setTimeout(function () {
 					infiniteRepeat(site, places, queries, i, j, page);
-				}, helpers.randomRange(100000, 200000));
+            }, helpers.randomRange(230000, 380000));
 			} else { 
 				// ================
 				// NO RESULTS FOUND
@@ -114,7 +119,7 @@ function infiniteRepeat(site, places, queries,i , j, page, tryCount) {
 				increment(); // tries another query and/or location
 				setTimeout(function () {
 					infiniteRepeat(site, places, queries, i, j, 1);
-				}, helpers.randomRange(00000, 500000));
+            }, helpers.randomRange(230000, 380000));
 			}
 
 		} else {
@@ -133,97 +138,22 @@ function infiniteRepeat(site, places, queries,i , j, page, tryCount) {
 			}
 			setTimeout(function () {
 				infiniteRepeat(site, places, queries, i, j, 1, tryCount);
-			}, helpers.randomRange(300000, 500000));
+         }, helpers.randomRange(230000, 380000));
 		}
 	});
 
 }
-// Separate function calls are required for different sites
-// Would be ineffective to loop through the sites as well, and too compicated to add the logic to run in parallel when the alternative is just calling the function again with different values
-// infiniteRepeat('ejobs', data.cities, data.keywords, 0, 0, 1);
-// infiniteRepeat('bestjobs', data.cities, data.keywords, 0, 0, 1);
+
 
 
 // ejobs --> city: indexNumber, keyword: indexNumber, pageNumber: number
-
-/* models['ejobs'].findOne({}, function(err, data) {
-      if(!err) {
-         infiniteRepeat('ejobs', data.cities[data.city], data.keywords[data.keyword], data.pageNumber);
-      } else {
-         infiniteRepeat('ejobs', data.cities, data.keywords, 0, 0, 1);
-      }
-}); */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // DUPLICATE CHECKER
-// models['bestjobs'].find({}, function(err, data) {
-// 	console.log(data.length);
-// 	for(let i = 0; i < data.length - 1; i ++) {
-// 		for(let j = i + 1; j < data.length; j++) {
-// 			if(data[i].url === data[j].url) {
-// 				console.log('duplicate found');
-// 				break;
-// 			}
-// 		}
-// 	}
+// data.sites.forEach(function(site) {
+//    models[site].findOne({site: site}, function(err, values) {
+//       if(!err && values) {
+//          infiniteRepeat(site, data.cities, data.keywords, values.keyword, values.city, values.page);
+      
+//       } else {
+//          infiniteRepeat(site, data.cities, data.keywords, 0, 0, 1);
+//       }
+//    })
 // });
-
-
-
-// Routes
-// app.get('/', function(req, res) {
-// 	// the list of jobs should appear here
-// });
-
-// // express listening start
-// app.listen(3000, function() {
-// 	console.log('The app has started');
-// });
-
-/* 
-	How the APP should work:
-
-	Run functions in parallel based on the jobs (so they won't kick you out for making too many requests)
-
-	These functions should loop through the city --> keywords, the other city --> the same keywords
-		This should happen indefintely
-			The requests should be, of coruse, delayed (significantly) as to not overflow the server with requests
-
-		Relating to pages
-			Each search query can have multiple pages
-			The function should attempt to requets another page unless the results count for the current page is 0 (meaning that there is no other page to display)
-
-		There are bound to be errors in the requests, or (even though less common) in the saving on the DB itself, they should be handled somehow
-
-		Assuming you make a request for a site, search query, page and you get some results back, you should SAVE them in a db
-
-		BUT, you need to check so that you don't add dudplicates, so you only add those who are not alread in the DB
-
-		Of course, a "deleted", "saved" and "current" area should be in the DB, and if a job ad already exists in either of these areas, it should NOT be added
-
-		Each of the sites should have a different collection in the DB
-*/

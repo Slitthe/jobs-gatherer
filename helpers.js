@@ -21,23 +21,17 @@ var randomRange = function (start, finish) {
    return Math.round(Math.random() * difference) + start;
 };
 
-// Splits the DB data by their type: 'default', 'saved' or 'deleted'
 
-// var dataSplitter = function(items) {
-//    let types = {
-//       deleted:[],
-//       saved: [],
-//       default: []
-//    };
-//    let typesKeys = Object.keys(types);
-
-//    items.forEach(function(item) {
-//       types[item.filterCat].push(item);
-//    });
-//    return types;
-// };
-
-
+// Splits the data by category and city
+/* 
+return FORMAT:  >>
+            type: {
+               filterType: {
+                  city: [item1, item2 ....],
+                  ...
+               }....
+            }
+*/
 var dataSplitter = function(items) {
 
    let types = {
@@ -52,30 +46,27 @@ var dataSplitter = function(items) {
       types[item.filterCat][item.city] = types[item.filterCat][item.city] || [];
       types[item.filterCat][item.city].push(item);
    });
-   console.log(types);
    return types;
 };
 
 
+// Removes every item in the DB (except the filterCat === 'saved' items) if they have passed an expiry date (7 days from update)
 var removeExpired = function(models, sites) {
 
    sites.forEach(function(site) {
-      console.log(site);
 
       models[site].find({}, function(err, results) {
          if(!err) {
-            console.log(results.length);
             var l = 0;
             results.forEach(function(result) {
                if(result.filterCat !== 'saved') {
                   l++;
-                  if (Date.now() >= result.updateDate.getTime() + 36000) {
+                  if (Date.now() >= result.updateDate.getTime() + 604800000) {
                      result.remove();
-                     // result.save();
+                     result.save();
                   }
                }
             });
-            console.log(l);
          }
 
       });
