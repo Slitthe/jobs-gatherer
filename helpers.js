@@ -22,19 +22,40 @@ var randomRange = function (start, finish) {
 };
 
 // Splits the DB data by their type: 'default', 'saved' or 'deleted'
+
+// var dataSplitter = function(items) {
+//    let types = {
+//       deleted:[],
+//       saved: [],
+//       default: []
+//    };
+//    let typesKeys = Object.keys(types);
+
+//    items.forEach(function(item) {
+//       types[item.filterCat].push(item);
+//    });
+//    return types;
+// };
+
+
 var dataSplitter = function(items) {
+
    let types = {
-      deleted: [],
-      saved: [],
-      default: []
+      deleted: {},
+      saved: {},
+      default: {}
    };
    let typesKeys = Object.keys(types);
 
    items.forEach(function(item) {
-      types[item.filterCat].push(item);
+      types[item.filterCat] = types[item.filterCat] || [];
+      types[item.filterCat][item.city] = types[item.filterCat][item.city] || [];
+      types[item.filterCat][item.city].push(item);
    });
+   console.log(types);
    return types;
 };
+
 
 var removeExpired = function(models, sites) {
 

@@ -1,25 +1,23 @@
 const keywords = [
    'web developer',
-   'front end',
+   // 'front end',
+   // 'front end developer',
+   // 'css',
+   // 'css3',
+   // 'html',
+   // 'html5',
+   // 'bootstrap',
+   // 'jquery',
+   // 'javascript',
+   // 'js',
+   // 'software developer',
+   // 'javascript developer',
+   // 'developer',
+   // 'programmer',
+   // 'programator',
+   // 'it',
+   // 'dezvoltator'
 ];
-/* 
-   'front end developer',
-   'css',
-   'css3',
-   'html',
-   'html5',
-   'bootstrap',
-   'jquery',
-   'javascript',
-   'js',
-   'software developer',
-   'javascript developer',
-   'developer',
-   'programmer',
-   'programator',
-   'it',
-   'dezvoltator'
-*/
 
 // The cities to search in
 const cities = [

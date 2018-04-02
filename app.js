@@ -20,7 +20,7 @@ app.use( bodyParser.urlencoded({extended: true}) );
 
 routes(app);
 
-app.listen(3000, function() {
+app.listen(4444, function() {
 	console.log('EXPRESS started listening');
 });
 
@@ -47,16 +47,16 @@ function infiniteRepeat(site, places, queries,i , j, page, tryCount) {
       }
    };
    
-   models.value.findOne({site: site}, function(err, data) {
-      if(!err) {
-         data.keyword = i;
-         data.city = j;
-         data.page = page;
-         data.save();
-      } else {
+   // models.value.findOne({site: site}, function(err, data) {
+   //    if(!err) {
+   //       data.keyword = i;
+   //       data.city = j;
+   //       data.page = page;
+   //       data.save();
+   //    } else {
 
-      }
-   })
+   //    }
+   // });
 
 	let url = getUrls(page, queries[i], places[j], site); // req URL
 
@@ -84,12 +84,12 @@ function infiniteRepeat(site, places, queries,i , j, page, tryCount) {
 									models[site].create({
 										url: current.url,
 										title: current.title,
-										city: places[i]
+										city: places[j]
 									});
-								} else {
+								} else { // if it already exists, just 
                            models[site].findOne({url: current.url}, function(err, data) {
                               if(!err) {
-                                 data.expiryDate = Date.now();
+                                 data.updateDate = Date.now();
                                  data.save();
                               }
                            })
@@ -104,7 +104,7 @@ function infiniteRepeat(site, places, queries,i , j, page, tryCount) {
 				page++; // increments the page if results were found
 				setTimeout(function () {
 					infiniteRepeat(site, places, queries, i, j, page);
-				}, helpers.randomRange(300000, 500000));
+				}, helpers.randomRange(100000, 200000));
 			} else { 
 				// ================
 				// NO RESULTS FOUND
@@ -114,7 +114,7 @@ function infiniteRepeat(site, places, queries,i , j, page, tryCount) {
 				increment(); // tries another query and/or location
 				setTimeout(function () {
 					infiniteRepeat(site, places, queries, i, j, 1);
-				}, helpers.randomRange(300000, 500000));
+				}, helpers.randomRange(00000, 500000));
 			}
 
 		} else {
@@ -140,8 +140,8 @@ function infiniteRepeat(site, places, queries,i , j, page, tryCount) {
 }
 // Separate function calls are required for different sites
 // Would be ineffective to loop through the sites as well, and too compicated to add the logic to run in parallel when the alternative is just calling the function again with different values
-infiniteRepeat('ejobs', data.cities, data.keywords, 0, 0, 1);
-infiniteRepeat('bestjobs', data.cities, data.keywords, 0, 0, 1);
+// infiniteRepeat('ejobs', data.cities, data.keywords, 0, 0, 1);
+// infiniteRepeat('bestjobs', data.cities, data.keywords, 0, 0, 1);
 
 
 // ejobs --> city: indexNumber, keyword: indexNumber, pageNumber: number

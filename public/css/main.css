@@ -11,14 +11,14 @@
    padding: 0;
 }
 
-.result-item:hover {
+.list-group-item:hover {
    background: rgba(82%, 82%, 82%, 0.7);
 }
-.result-item:active {
+.list-group-item:active {
    background: rgba(82%, 82%, 82%, 0.9);
 }
 
-.result-item:focus {
+.list-group-item:focus {
    background: rgba(87%, 87%, 87%, 0.95);
 }
 
@@ -30,6 +30,6 @@
 }
 
 .result-type {
-   margin: 50px 0;
+   margin-bottom: 150px;
 }
 

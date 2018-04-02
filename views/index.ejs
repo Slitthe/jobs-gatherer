@@ -3,68 +3,100 @@
       <a class='btn btn-link' href='/'>‹‹ Go Home</a>
       <h1><%= site.toUpperCase() %></h1>
 
-      <div class='result-type'>
-         <h2>Saved Results</h2>
-         <ul class='list-group'>
-            <% results.saved.forEach(function(result) { %>
-               <li class='list-group-item row position-relative'>
-                  <a class='col-xs-8 result-item' href='<%= result.url %>' target='_blank'>
-                     <%= result.title %>
-                  </a>
-                  <div class="position-absolute btn-group func-btns" role="group" aria-label="Basic example" data-id='<%= result._id%>'>
-                     <button type="button" class="px-3 btn btn-danger delete-btn" title='Delete listing'>
-                        <i class='fa fa-trash'></i>
-                     </button>
-                  </div>
+      <div class='result-type' data-category='saved'>
+         <h3 class='text-center'>Saved</h3>
+         <% Object.keys(results.saved).forEach(function(key) { %>
+            <ul class='list-group' data-city='<%= key%>'>
+               <li class='list-group-item row text-center py-2 text-muted' >
+                  <h4><%= key %>
+                      
+                     (<span class='counter'>
+                        <%= results.saved[key].length%>
+                     </span>)</h4>
                </li>
-            <% })%>
-         </ul>
+               <% results.saved[key].forEach(function(item) { %>
+                  <li class='list-group-item row position-relative'>
+                     <a class='col-xs-8 result-item' href='<%= item.url %>' target='_blank'>
+                        <%= item.title %>
+                     </a>
+                     <div class="position-absolute btn-group func-btns" role="group" aria-label="Basic example" data-id='<%= item._id%>'>
+                        <button type="button" class="px-3 btn btn-danger delete-btn" title='Delete listing'>
+                           <i class='fa fa-trash'></i>
+                        </button>
+                     </div>
+                  </li>
+               <% }); %>
+            </ul>
+         <% }) %>
       </div>
+
+      <div class='result-type' data-category='default'>
+         <h3 class='text-center'>Results</h3>
+         <% Object.keys(results.default).forEach(function(key) { %>
+            <ul class='list-group' data-city='<%= key%>'>
+               <li class='list-group-item row text-center py-2 text-muted'>
+                  <h4>
+                     <%= key %>
+                     (<span class='counter'><%= results.default[key].length%></span>)</h4>
+               </li>
+               <% results.default[key].forEach(function(item) { %>
+                  <li class='list-group-item row position-relative'>
+                     <a class='col-xs-8 result-item' href='<%= item.url %>' target='_blank'>
+                        <%= item.title %>
+                     </a>
+                     <div class="position-absolute btn-group func-btns" role="group" aria-label="Basic example" data-id='<%= item._id%>'>
+                        <button type="button" class="px-3 btn btn-success save-btn" title='Save listing'>
+                           <i class='fa fa-floppy-o'></i>
+                        </button>
+                        <button type="button" class="px-3 btn btn-danger delete-btn" title='Delete listing'>
+                           <i class='fa fa-trash'></i>
+                        </button>
+                     </div>
+                  </li>
+               <% }); %>
+            </ul>
+         <% }) %>
+      </div>
+
+      <div class='result-type' data-category='deleted'>
+            <p class='text-center lead'>Deleted Results</p>
+         <% Object.keys(results.deleted).forEach(function(key) { %>
+            <h3 class='text-muted'>
+               <%= key %>
+            </h3>
+            <button class='toggle-hidden-next btn btn-secondary'>&#9660</button>
+            <ul class='list-group deleted-results d-none' data-city='<%=key%>'>
+               <li class='list-group-item row text-center py-2 text-muted'>
+                  <h4>
+                     <%= key %>
+                     (
+                      <span class='counter'>
+                        <%= results.deleted[key].length%>
+                      </span>)
+                  </h4>
+               </li>
+               <% results.deleted[key].forEach(function(item) { %>
+                  <li class='list-group-item row position-relative'>
+                     <a class='col-xs-8 result-item' href='<%= item.url %>' target='_blank'>
+                        <%= item.title %>
+                     </a>
+                     <div class="position-absolute btn-group func-btns" role="group" aria-label="Basic example" data-id='<%= item._id%>'>
+                        <button type="button" class="px-3 btn btn-success save-btn" title='Save listing'>
+                           <i class='fa fa-floppy-o'></i>
+                        </button>
+                        <button type="button" class="px-3 btn btn-secondary restore-btn" title='Delete listing'>
+                           <i class='fa fa-undo'></i>
+                        </button>
+                     </div>
+                  </li>
+               <% }); %>
+            </ul>
+         <% }) %>
+      </div>
+
+
       
 
-      <div class='result-type'>
-         <h2>Results</h2>
-         <ul class='list-group'>
-            <% results.default.forEach(function(result) { %>
-               <li class='list-group-item row position-relative'>
-                  <a class='col-xs-8 result-item' href='<%= result.url %>' target='_blank'>
-                     <%= result.title %>
-                  </a>
-                  <div class="position-absolute btn-group func-btns" role="group" aria-label="Basic example" data-id='<%= result._id%>'>
-                     <button type="button" class="px-3 btn btn-success save-btn" title='Save listing'>
-                        <i class='fa fa-floppy-o'></i>
-                     </button>
-                     <button type="button" class="px-3 btn btn-danger delete-btn" title='Delete listing'>
-                        <i class='fa fa-trash'></i>
-                     </button>
-                  </div>
-               </li>
-            <% })%>
-         </ul>
-      </div>
-      
-
-      <div class='result-type'>
-         <h2>Deleted Results</h2>
-         <button class='toggle-hidden-next btn btn-secondary'>&#9660</button>
-         <ul class='list-group deleted-results d-none'>
-            <% results.deleted.forEach(function(result) { %>
-               <li class='list-group-item row position-relative'>
-                  <a class='col-xs-8 result-item' href='<%= result.url %>' target='_blank'>
-                     <%= result.title %>
-                  </a>
-                  <div class="position-absolute btn-group func-btns" role="group" aria-label="Basic example" data-id='<%= result._id%>'>
-                     <button type="button" class="px-3 btn btn-success save-btn" title='Save listing'>
-                        <i class='fa fa-floppy-o'></i>
-                     </button>
-                     <button type="button" class="px-3 btn btn-secondary restore-btn" title='Delete listing'>
-                        <i class='fa fa-undo'></i>
-                     </button>
-                  </div>
-               </li>
-            <% })%>
-         </ul>
-      </div>
       
    </div>
 <% include partials/footer %>

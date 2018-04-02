@@ -41,11 +41,18 @@ var routes = function(app) {
 				type = req.body.type.toLowerCase(),
 				id = req.body.id;
 		if(models[site] && types.indexOf(req.body.type) > -1) {
-			models[site].findByIdAndUpdate(id, {$set: {
+			models[site].findByIdAndUpdate(id, {
+            $set: {
             filterCat: type
-         }}, function(err, data) {
-            console.log(type,data);
-            
+         }
+      }, function(err, data) {
+            if(!err) {
+               console.log('Updated ' + Date.now());
+               res.send('Updated')
+            } else {
+               res.status(401);
+               res.send('Nope');
+            }
          });
 		}
 	});
