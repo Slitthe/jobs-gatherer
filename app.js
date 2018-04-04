@@ -35,22 +35,9 @@ app.listen(5555, function() {
 // Main app function (delayed infinite loop through 2 arrays: keywords and locations)
 
 function infiniteRepeat(obj, data) {
-   helpers.removeExpired(models, data.sites);
+   helpers.removeExpired(models, data.sites); // remove any expired DB entries
+   helpers.saveValues(obj); // save indices & page to DB
    
-   /* 
-   helpers.addValues(obj)
-   */
-   // helpers.saveValues(obj);
-   models.value.findOne({site: obj.site}, function(err, data) { // add values
-      if(!err && data) {
-         data.keyword = obj.queries.index;
-         data.city = obj.places.index;
-         data.page = obj.page;
-         data.save();
-      } else {
-         models.value.create({site: obj.site});
-      }
-   });
 
    let url = getUrls(obj.page, obj.queries.values[obj.queries.index], obj.places.values[obj.places.index], obj.site); // req URL
 
@@ -66,7 +53,13 @@ function infiniteRepeat(obj, data) {
          if(parsed) { // 1 or more results (otherwise parsed is null)
             console.log('Results found, number: ' + parsed.length)
             helpers.dbAdd(obj.site, obj.places.values[obj.places.index], parsed);
-
+// infiniteRepeat({
+//    site: 'ejobs',
+//    queries: {values: data.keywords, index: 0},
+//    places: {values: data.cities, index: 0},
+//    page: 1,
+//    tryCount: 1
+// }, data);
 				obj.page++; // increment the page
             helpers.repeat(obj, data, false, infiniteRepeat); // but DO NOT increment queries/places
 			} else { 

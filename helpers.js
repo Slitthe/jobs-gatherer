@@ -119,10 +119,23 @@ var repeat = function (obj, data, toIncrement, func) {
 
    setTimeout(function () {
       func(obj, data);
-   }, helpers.randomRange(250000, 350000));
+   }, helpers.randomRange(50000, 50000));
    // setTimeout(function () {
    //    func(obj, data);
    // }, helpers.randomRange(230000, 380000));
+};
+
+var saveValues = function(saveObj) {
+   models.value.findOne({ site: saveObj.site }, function (err, data) { // add values
+      if (!err && data) {
+         data.keyword = saveObj.queries.index;
+         data.city = saveObj.places.index;
+         data.page = saveObj.page;
+         data.save();
+      } else {
+         models.value.create({ site: saveObj.site });
+      }
+   });
 };
 
 
@@ -132,5 +145,6 @@ module.exports = {
    dataSplitter: dataSplitter,
    removeExpired: removeExpired,
    repeat: repeat,
-   dbAdd: dbAdd
+   dbAdd: dbAdd,
+   saveValues: saveValues
 };
