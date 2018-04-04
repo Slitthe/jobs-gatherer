@@ -1,16 +1,23 @@
+var models = require('./models');
 // checks an array of objects for the existance of a property
-var duplicateChecker = function(from, checked, property) {
-   let value = from[property],
+var duplicateChecker = function(source, targets, property) {
+   /* 
+      Input: source--> the source object
+             targets --> the target object
+             property --> the property of the source ( source[property] ) that the targets are checked against for duplicity
+   */
+   let value = source[property],
        isDuplicate = false,
-       l = checked.length;
+       l = targets.length;
       
    for(let i = 0; i < l; i++) {
-      if (value === checked[i][property]) {
+      if (value === targets[i][property]) {
          isDuplicate = true;
          break;
       }
    }
 
+   // if any one of the targets contain a target[property] === source[property], then the boolean return is true
    return isDuplicate; // true if there IS a duplicate
 };
 
@@ -19,6 +26,30 @@ var duplicateChecker = function(from, checked, property) {
 var randomRange = function (start, finish) {
    const difference = finish - start;
    return Math.round(Math.random() * difference) + start;
+};
+
+var dbAdd = function (site, place, parsed) {
+   models[site].find({}, function (err, dbRes) {
+      // Gets dbRes about the listings in the DB to compare duplication
+      if (dbRes) {
+         parsed.forEach(function (current) {
+            if (!helpers.duplicateChecker(current, dbRes, 'url')) { // doesn't add the listing if it already exists in the DB
+               models[site].create({
+                  url: current.url,
+                  title: current.title,
+                  city: place
+               });
+            } else { // if it already exists, just 
+               models[site].findOne({ url: current.url }, function (err, dbRes) {
+                  if (!err && dbRes) {
+                     dbRes.updateDate = Date.now();
+                     dbRes.save();
+                  }
+               })
+            }
+         });
+      }
+   });
 };
 
 
@@ -52,16 +83,14 @@ var dataSplitter = function(items) {
 
 // Removes every item in the DB (except the filterCat === 'saved' items) if they have passed an expiry date (7 days from update)
 var removeExpired = function(models, sites) {
-
+   
    sites.forEach(function(site) {
-
-      models[site].find({}, function(err, results) {
-         if(!err) {
-            var l = 0;
+      models[site].find({}, function(err, results) { // find all the results for this given site
+         if(!err) { // check for DB communication error
             results.forEach(function(result) {
-               if(result.filterCat !== 'saved') {
-                  l++;
-                  if (Date.now() >= result.updateDate.getTime() + 604800000) {
+               if(result.filterCat !== 'saved') { // ignore 'saved' items
+                  if (Date.now() >= result.updateDate.getTime() + 604800000) { // check for expiry date
+                     // remove & save
                      result.remove();
                      result.save();
                   }
@@ -70,9 +99,30 @@ var removeExpired = function(models, sites) {
          }
 
       });
-
    });
+};
 
+var repeat = function (obj, data, toIncrement, func) {
+   if (toIncrement) {
+      if (obj.queries.index < obj.queries.values.length - 1) {
+         obj.queries.index++
+      } else {
+         if (obj.places.index < obj.places.values.length - 1) {
+            obj.places.index++;
+         } else {
+            obj.places.index = 0;
+         }
+         obj.queries.index = 0;
+      }
+   };
+   
+
+   setTimeout(function () {
+      func(obj, data);
+   }, helpers.randomRange(250000, 350000));
+   // setTimeout(function () {
+   //    func(obj, data);
+   // }, helpers.randomRange(230000, 380000));
 };
 
 
@@ -80,5 +130,7 @@ module.exports = {
    duplicateChecker: duplicateChecker,
    randomRange: randomRange,
    dataSplitter: dataSplitter,
-   removeExpired: removeExpired
+   removeExpired: removeExpired,
+   repeat: repeat,
+   dbAdd: dbAdd
 };

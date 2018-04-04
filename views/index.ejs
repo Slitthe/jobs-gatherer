@@ -1,4 +1,5 @@
 <% include partials/header %>
+
    <div class='container my-5'>
       <a class='btn btn-link' href='/'>‹‹ Go Home</a>
       <h1><%= site.toUpperCase() %></h1>
@@ -29,7 +30,7 @@
                      </span>)</h4>
                </li>
                <% results.saved[key].forEach(function(item) { %>
-                  <li class='list-group-item row position-relative'>
+                  <li class='list-group-item row position-relative' tabindex='-1'>
                      <a class='col-xs-8 result-item' href='<%= item.url %>' target='_blank'>
                         <%= item.title %>
                      </a>
@@ -69,7 +70,7 @@
                      (<span class='counter'><%= results.default[key].length%></span>)</h4>
                </li>
                <% results.default[key].forEach(function(item) { %>
-                  <li class='list-group-item row position-relative'>
+                  <li class='list-group-item row position-relative' tabindex='-1'>
                      <a class='col-xs-8 result-item' href='<%= item.url %>' target='_blank'>
                         <%= item.title %>
                      </a>
@@ -121,7 +122,7 @@
                   </h4>
                </li>
                <% results.deleted[key].forEach(function(item) { %>
-                  <li class='list-group-item row position-relative'>
+                  <li class='list-group-item row position-relative' tabindex='-1'>
                      <a class='col-xs-8 result-item' href='<%= item.url %>' target='_blank'>
                         <%= item.title %>
                      </a>

@@ -2,9 +2,10 @@
 const data = require('./data'),
       mongoose = require('mongoose');
 
+mongoose.connect('mongodb://localhost/jobs_test_db');
 
 
-var siteSchema = new mongoose.Schema({
+var jobSchema = new mongoose.Schema({
    url: String,
    title: String,
    city: String,

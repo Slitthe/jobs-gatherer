@@ -82,6 +82,14 @@ $('.func-btns').on('click', '.delete-btn', function(){
 });
 
 
+
+
+// $('.list-group-item').on('mouseover', function(evt){
+//    console.log(this);
+//    this.focus();
+// });
+
+
 // Restore
 $('.func-btns').on('click', '.restore-btn', function () {
    let id = $(this).parent().attr('data-id');
