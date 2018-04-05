@@ -1,0 +1,19 @@
+<% include partials/header %>
+
+   <div class='container my-5'>
+      <ul class='list-group mb-5'>
+         <h2>Keywords</h2>
+         <% data.keywords.forEach(function(keyword) { %>
+            <li class='list-group-item'><%=keyword%></li>
+         <% }) %>
+      </ul>
+
+      <ul class='list-group mb-5'>
+         <h2>Locations</h2>
+         <% data.cities.forEach(function(cities) { %>
+            <li class='list-group-item'><%=cities%></li>
+         <% }) %>
+      </ul>
+   </div>
+
+<% include partials/footer %>

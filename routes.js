@@ -1,6 +1,10 @@
-const models = require('./models');
+const 
       data = require('./data'),
-      helpers = require('./helpers');
+      helpers = require('./helpers'),
+      bodyParser = require('body-parser');
+
+var models = require('./models');
+console.log('route ' + !!models.searchData);
 
 var routes = function(app) {
 
@@ -8,6 +12,31 @@ var routes = function(app) {
 	app.get('/' ,function(req, res) {
 		res.render('home', {data: data});
 	});
+   app.get('/settings', function(req, res) {
+      res.render('settings', {data: data});
+   });
+
+   app.post('/start', function(req, res) { 
+      data.runData.start(helpers.starter, [data, models, helpers.infiniteRepeat]);
+      res.send('The route for starting the runner');
+   });
+
+   app.post('/stop', function(req, res) {
+      data.runData.cancel();
+      res.send('The route for stopping the runner');
+   });
+
+   app.get('/status', function (req, res) {
+
+      res.send(data.runData.isRunning);
+   });
+   app.post('/updateValue', function (req, res) {
+      var body = req.body;
+      console.log(body);
+      
+      console.log(data.updateValues(body, models));
+      res.send(data.runData.isRunning);
+   });
 
    // 'site' INDEX PAGE
 	app.get('/:site', function(req, res) {
@@ -57,7 +86,8 @@ var routes = function(app) {
             }
          });
 		}
-	});
+   });
+   
 
 };
 

@@ -28,6 +28,7 @@
   "homepage": "https://github.com/Slitthe/jobs-crawler#readme",
   "dependencies": {
     "body-parser": "^1.18.2",
+    "colors": "^1.2.1",
     "ejs": "^2.5.8",
     "express": "^4.16.3",
     "method-override": "^2.3.10",

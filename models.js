@@ -36,6 +36,39 @@ var valueSchema = new mongoose.Schema({
    site: String
 });
 
+var searchDataSchema = new mongoose.Schema({
+   list: [String],
+   type: String
+});
+
+var SearchData = mongoose.model('searchData', searchDataSchema);
+// SearchData.create({
+//    type: 'keywords',
+//    list: ['web developer',
+//       'front end',
+//       'front end developer',
+//       'css',
+//       'css3',
+//       'html',
+//       'html5',
+//       'bootstrap',
+//       'jquery',
+//       'javascript',
+//       'js',
+//       'software developer',
+//       'javascript developer',
+//       'developer',
+//       'programmer',
+//       'programator',
+//       'it',]
+// });
+// SearchData.create({
+//    type: 'cities',
+//    list: ['brasov', 'cluj-napoca']
+// });
+
+
+
 function createModels(sites, schema) { // creates a model for each site, following the 'siteSchema' schema 
    var models = {};
    for (let i = 0; i < sites.length; i++) {
@@ -45,6 +78,7 @@ function createModels(sites, schema) { // creates a model for each site, followi
    return models;
 }
 var models = createModels(data.sites, jobSchema);
+models.searchData = SearchData;
 models.value = mongoose.model('Value', valueSchema);
 
 

@@ -1,10 +1,14 @@
 <% include partials/header %>
 <div class='container m-5'>
-   <h1 class='border-bottom'>Sites</h1>
+   <h1 class='border-bottom'>Results</h1>
    <% data.sites.forEach(function(site) { %>
       <p>
          <a class='btn btn-primary' href='<%= site %>'><%= site %></a>
       </p>
    <% }) %>
+
+   <hr>
+
+   <a class='btn btn-secondary' href='/settings'>Change the settings</a>
 </div>
 <% include partials/footer %>

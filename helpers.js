@@ -1,4 +1,10 @@
 var models = require('./models');
+var data = require('./data');
+var getUrls = require('./urlConstructor');
+var parse = require('./parser');
+var request = require('request');
+var colors = require('colors');
+console.log('help '  + !!models.searchData);
 // Simple pseudo-random numbers range generator [start, finish] (includes extremities)
 var randomRange = function (start, finish) {
    const difference = finish - start;
@@ -35,7 +41,7 @@ var dbAdd = function (site, place, parsed) {
       // Gets dbRes about the listings in the DB to compare duplication
       if (dbRes) {
          parsed.forEach(function (current) {
-            if (!helpers.duplicateChecker(current, dbRes, 'url')) { // doesn't add the listing if it already exists in the DB
+            if (!duplicateChecker(current, dbRes, 'url')) { // doesn't add the listing if it already exists in the DB
                models[site].create({
                   url: current.url,
                   title: current.title,
@@ -117,9 +123,9 @@ var repeat = function (obj, data, toIncrement, func) {
    };
    
 
-   setTimeout(function () {
+   data.runData.runTimeout = setTimeout(function () {
       func(obj, data);
-   }, helpers.randomRange(50000, 50000)); //230000, 380000
+   }, randomRange(10000, 10000)); //230000, 380000
 };
 
 // save the current search location values to the DB
@@ -157,6 +163,105 @@ var btnGroups = function (type) {
    };
 }();
 
+// var starter = function () {
+//    data.sites.forEach(function (site) {
+//       models.value.findOne({ site: site }, function (err, values) {
+//          if (!err && values) {
+//             actionFunc({
+//                site: site,
+//                queries: { values: data.keywords, index: values.keyword },
+//                places: { values: data.cities, index: values.city },
+//                page: values.page,
+//                tryCount: 1
+//             }, data);
+
+//          } else {
+//             actionFunc({
+//                site: site,
+//                queries: { values: data.keywords, index: 0 },
+//                places: { values: data.cities, index: 0 },
+//                page: 1,
+//                tryCount: 1
+//             }, data);
+//          }
+//       });
+//    });
+// };
+
+var starter = function (data, models, runFunc) {
+   data.getData(models, function (dataRes) {
+      data.sites.forEach(function (site) {
+         models.value.findOne({ site: site }, function (err, values) {
+            if (!err && values) {
+               runFunc({
+                  site: site,
+                  queries: { values: dataRes.keywords, index: values.keyword },
+                  places: { values: dataRes.cities, index: values.city },
+                  page: values.page,
+                  tryCount: 1
+               }, data);
+
+            } else {
+               runFunc({
+                  site: site,
+                  queries: { values: dataRes.keywords, index: 0 },
+                  places: { values: dataRes.cities, index: 0 },
+                  page: 1,
+                  tryCount: 1
+               }, data);
+            }
+         });
+      });
+   });
+};
+
+function infiniteRepeat(obj, data) {
+   if (data.runData.continue) {
+      removeExpired(models, data.sites); // remove any expired DB entries
+      saveValues(obj); // save indices & page to DB
+
+      var url = getUrls(obj.page, obj.queries.values[obj.queries.index], obj.places.values[obj.places.index], obj.site); // req URL
+
+      request(url, function (err, response, body) {
+         console.log('Request attempt made: , tryCount: ' + obj.tryCount, colors.yellow(url));
+         console.log(colors.bgBlack(new Date().getSeconds()))
+
+         if (!err && response.statusCode === 200) { // successful request
+            obj.tryCount = 1;
+            let parsed = parse({
+               str: body,
+               site: obj.site
+            }); // parsed HTML request to extract the jobs listing (if any)
+            if (parsed) { // 1 or more results (otherwise parsed is null)
+               console.log(colors.green('Results found, number: ') + parsed.length)
+               dbAdd(obj.site, obj.places.values[obj.places.index], parsed);
+
+               obj.page++; // increment the page
+               repeat(obj, data, false, infiniteRepeat); // but DO NOT increment queries/places
+            } else {
+               // no results found
+               console.log(colors.red('No results found'));
+
+               obj.page = 1; // reset the page
+
+               repeat(obj, data, true, infiniteRepeat); // increment the queries/places when there are no results for the current page
+            }
+
+         } else {
+            // request error
+            if (obj.tryCount < 3) { // try again for a maximum of 'n' times (curent: 3)
+               obj.tryCount++;
+               repeat(obj, data, false, infiniteRepeat);
+            } else { // skip for the next item in the location/keywords when too many attempted tries failed
+               obj.tryCount = 1;
+               repeat(obj, data, true, infiniteRepeat);
+            }
+         }
+      });
+   }
+};
+
+
 
 module.exports = {
    duplicateChecker: duplicateChecker,
@@ -166,5 +271,7 @@ module.exports = {
    repeat: repeat,
    dbAdd: dbAdd,
    saveValues: saveValues,
-   btnGroups
+   btnGroups: btnGroups,
+   starter: starter,
+   infiniteRepeat: infiniteRepeat
 };
