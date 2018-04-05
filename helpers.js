@@ -1,12 +1,18 @@
 var models = require('./models');
+// Simple pseudo-random numbers range generator [start, finish] (includes extremities)
+var randomRange = function (start, finish) {
+   const difference = finish - start;
+   return Math.round(Math.random() * difference) + start;
+};
+
 // checks an array of objects for the existance of a property
 var duplicateChecker = function(source, targets, property) {
    /* 
       Input: source--> the source object
-             targets --> the target object
+             targets --> the targets object
              property --> the property of the source ( source[property] ) that the targets are checked against for duplicity
    */
-   let value = source[property],
+   var value = source[property],
        isDuplicate = false,
        l = targets.length;
       
@@ -22,12 +28,8 @@ var duplicateChecker = function(source, targets, property) {
 };
 
 
-// Simple pseudo-random numbers range generator [start, finish] (includes extremities)
-var randomRange = function (start, finish) {
-   const difference = finish - start;
-   return Math.round(Math.random() * difference) + start;
-};
 
+// add results to the DB
 var dbAdd = function (site, place, parsed) {
    models[site].find({}, function (err, dbRes) {
       // Gets dbRes about the listings in the DB to compare duplication
@@ -64,13 +66,12 @@ return FORMAT:  >>
             }
 */
 var dataSplitter = function(items) {
-
-   let types = {
+   var types = {
       deleted: {},
       saved: {},
       default: {}
    };
-   let typesKeys = Object.keys(types);
+   var typesKeys = Object.keys(types);
 
    items.forEach(function(item) {
       types[item.filterCat] = types[item.filterCat] || [];
@@ -89,8 +90,7 @@ var removeExpired = function(models, sites) {
          if(!err) { // check for DB communication error
             results.forEach(function(result) {
                if(result.filterCat !== 'saved') { // ignore 'saved' items
-                  if (Date.now() >= result.updateDate.getTime() + 604800000) { // check for expiry date
-                     // remove & save
+                  if (Date.now() >= result.updateDate.getTime() + 604800000) { // 604800000
                      result.remove();
                      result.save();
                   }
@@ -119,14 +119,12 @@ var repeat = function (obj, data, toIncrement, func) {
 
    setTimeout(function () {
       func(obj, data);
-   }, helpers.randomRange(50000, 50000));
-   // setTimeout(function () {
-   //    func(obj, data);
-   // }, helpers.randomRange(230000, 380000));
+   }, helpers.randomRange(50000, 50000)); //230000, 380000
 };
 
+// save the current search location values to the DB
 var saveValues = function(saveObj) {
-   models.value.findOne({ site: saveObj.site }, function (err, data) { // add values
+   models.value.findOne({ site: saveObj.site }, function (err, data) {
       if (!err && data) {
          data.keyword = saveObj.queries.index;
          data.city = saveObj.places.index;
@@ -138,6 +136,27 @@ var saveValues = function(saveObj) {
    });
 };
 
+var buttonCreators = function (type, cls, iType) {
+   var buttonHtml = '<button type="button" class="px-3 btn btn-' + type + ' ' + cls;
+   buttonHtml += '"> <i class="fa fa-' + iType + '"></i></button>'
+
+   return buttonHtml;
+};
+
+var btnGroups = function (type) {
+   return {
+      saved: (function () {
+         return buttonCreators('danger', 'delete-btn', 'trash');
+      })(),
+      default: (function () {
+         return buttonCreators('success', 'save-btn', 'floppy-o') + buttonCreators('danger', 'delete-btn', 'trash');
+      })(),
+      deleted: (function () {
+         return buttonCreators('success', 'save-btn', 'floppy-o') + buttonCreators('secondary', 'restore-btn', 'undo');
+      })()
+   };
+}();
+
 
 module.exports = {
    duplicateChecker: duplicateChecker,
@@ -146,5 +165,6 @@ module.exports = {
    removeExpired: removeExpired,
    repeat: repeat,
    dbAdd: dbAdd,
-   saveValues: saveValues
+   saveValues: saveValues,
+   btnGroups
 };

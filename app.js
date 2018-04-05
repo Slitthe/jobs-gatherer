@@ -25,7 +25,7 @@ app.use( bodyParser.urlencoded({extended: true}) );
 
 routes(app); // routes
 // EXPRESS start
-app.listen(5555, function() {
+app.listen(3000, function() {
 	console.log('EXPRESS started listening');
 });
 
@@ -39,7 +39,7 @@ function infiniteRepeat(obj, data) {
    helpers.saveValues(obj); // save indices & page to DB
    
 
-   let url = getUrls(obj.page, obj.queries.values[obj.queries.index], obj.places.values[obj.places.index], obj.site); // req URL
+   var url = getUrls(obj.page, obj.queries.values[obj.queries.index], obj.places.values[obj.places.index], obj.site); // req URL
 
 	request(url, function(err, response, body) {
       console.log('Request attempt made: , tryCount: ' + obj.tryCount, url);
@@ -53,13 +53,7 @@ function infiniteRepeat(obj, data) {
          if(parsed) { // 1 or more results (otherwise parsed is null)
             console.log('Results found, number: ' + parsed.length)
             helpers.dbAdd(obj.site, obj.places.values[obj.places.index], parsed);
-// infiniteRepeat({
-//    site: 'ejobs',
-//    queries: {values: data.keywords, index: 0},
-//    places: {values: data.cities, index: 0},
-//    page: 1,
-//    tryCount: 1
-// }, data);
+
 				obj.page++; // increment the page
             helpers.repeat(obj, data, false, infiniteRepeat); // but DO NOT increment queries/places
 			} else { 
@@ -67,7 +61,6 @@ function infiniteRepeat(obj, data) {
 				console.log('No results found');
 
             obj.page = 1; // reset the page
-            console.log(obj);
             
             helpers.repeat(obj, data, true, infiniteRepeat); // increment the queries/places when there are no results for the current page
 			}
@@ -94,33 +87,25 @@ function infiniteRepeat(obj, data) {
 
 
 // ejobs --> city: indexNumber, keyword: indexNumber, pageNumber: number
-data.sites.forEach(function(site) {
-   models[site].findOne({site: site}, function(err, values) {
-      if(!err && values) {
-         infiniteRepeat({
-            site: site,
-            queries: { values: data.keywords, index: values.keyword },
-            places: { values: data.cities, index: values.city },
-            page: values.page,
-            tryCount: 1
-         }, data);
+// data.sites.forEach(function(site) {
+//    models.value.findOne({site: site}, function(err, values) {
+//       if(!err && values) {
+//          infiniteRepeat({
+//             site: site,
+//             queries: { values: data.keywords, index: values.keyword },
+//             places: { values: data.cities, index: values.city },
+//             page: values.page,
+//             tryCount: 1
+//          }, data);
       
-      } else {
-         infiniteRepeat({
-            site: site,
-            queries: { values: data.keywords, index: 0 },
-            places: { values: data.cities, index: 0 },
-            page: 1,
-            tryCount: 1
-         }, data);
-      }
-   })
-});
-
-// infiniteRepeat({
-//    site: 'ejobs',
-//    queries: {values: data.keywords, index: 0},
-//    places: {values: data.cities, index: 0},
-//    page: 1,
-//    tryCount: 1
-// }, data);
+//       } else {
+//          infiniteRepeat({
+//             site: site,
+//             queries: { values: data.keywords, index: 0 },
+//             places: { values: data.cities, index: 0 },
+//             page: 1,
+//             tryCount: 1
+//          }, data);
+//       }
+//    });
+// });

@@ -21,7 +21,7 @@ var routes = function(app) {
                   // category and city data splitter
                   var splitData = helpers.dataSplitter(results);
                   // index template render
-						res.render('index', {results: splitData, site: site, data: data});
+						res.render('index', {results: splitData, site: site, data: data, btnGroups: helpers.btnGroups});
 					} else {
                   // 0 results in the DB
 						res.send('<p style="text-align: center;">No Results</p>')
