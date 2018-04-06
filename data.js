@@ -89,11 +89,12 @@ exportData.runData = {
       console.log(this.continue, this.runTimeout)
    },
    start: function(runner, args) {
-      if(this.isRunning) {
+      console.log(this.isRunning);
+      if(!this.isRunning) {
          this.continue = true;
          runner.apply(this, args);
       } else {
-         console.log('The search is already running')
+         console.log('The search is already running');
       }
    },
    get isRunning() {
@@ -101,38 +102,46 @@ exportData.runData = {
    }
 };
 
-exportData.updateValues = function (obj, models) {
-   if(!this.runData.isRunning) {
-      Object.keys(obj).forEach(function(type) {
-         if( (type === 'keywords' || type === 'cities') && Array.isArray(obj[type])) {
+exportData.updateValues = function (obj, models, add) {
+   console.log('Run state: :--> ' + this.runData.isRunning); 
+   console.log(colors.cyan(add));
+   if(!this.runData.isRunning) { // only modify when the 'requester' isn't running
+      Object.keys(obj).forEach(function(type) { // 'obj' is the data object of the POST request
+         if( (type === 'keywords' || type === 'cities') && Array.isArray(obj[type])) { // only take into consideration the two types
             obj[type] = obj[type].filter(function(currentItem) {
-               return typeof currentItem === 'string' && currentItem.length <= 60 && currentItem;
+               return typeof currentItem === 'string' && currentItem.length <= 60 && currentItem; // simple data sanitizer
+            });
+            obj[type] = obj[type].map(function(item) { // string lowercaser (after only strings were kept)
+               return item.toLowerCase();
             });
             
-            // models.searchData.findOneAndUpdate({type: type}, {$set: {list: obj[type]}},function(err, data) {
-            //    if(!err && data) {
-            //       obj[type].forEach(function(item) {
-            //          exportData[type].push(item);
-            //       });
-            //    }
-            // });
-
-            models.searchData.findOne({type: type}, function(err, dbRes) {
-               if (!err && dbRes) {
-                  console.log(colors.yellow('------------------------------'), obj);
-                  
+            models.searchData.findOne({type: type}, function(err, dbRes) { // access the DB data
+               if (!err && dbRes) { // check for errors
                   obj[type].forEach(function (item) {
-                     // if(dbRes.indexOf(item) > -1) {
-                        dbRes.list.push(item.toLowerCase());
-                     // }
+                     console.log(typeof add);
+                     if(add) {
+                        if(dbRes.list.indexOf(item) === -1) {
+                           dbRes.list.push(item.toLowerCase());
+                        }                        
+                     } else {
+                        var index = dbRes.list.indexOf(item);
+                        if(index !== -1) {
+                           dbRes.list.splice(index, 1);
+                        }  
+                     }
+
                   });
+                  console.log(colors.cyan('THIS IS THE DBRES LIST:-->>'), dbRes.list);
                   exportData[type] = dbRes.list;
                   dbRes.save();
                }
             });
+      
          }
       });
    }
-}
+};
+
+
 
 module.exports = exportData;

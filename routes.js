@@ -11,9 +11,10 @@ var routes = function(app) {
    // HOME ROUTE
 	app.get('/' ,function(req, res) {
 		res.render('home', {data: data});
-	});
+   });
+   
    app.get('/settings', function(req, res) {
-      res.render('settings', {data: data});
+      res.render('settings', {data: data, runState: data.runData.isRunning});
    });
 
    app.post('/start', function(req, res) { 
@@ -32,10 +33,16 @@ var routes = function(app) {
    });
    app.post('/updateValue', function (req, res) {
       var body = req.body;
-      console.log(body);
-      
-      console.log(data.updateValues(body, models));
-      res.send(data.runData.isRunning);
+      var add = body.add === 'false' || body.add === 'true' ? body.add : undefined;
+      if(add && typeof JSON.parse(body.add) === 'boolean') {
+         add = JSON.parse(add);
+         data.updateValues(body, models, add);
+         res.send('Correct');
+      } else {
+         res.status(400);
+         res.send('Incorrect request made');
+      }
+   
    });
 
    // 'site' INDEX PAGE
@@ -70,7 +77,7 @@ var routes = function(app) {
 		let 	types = ['deleted', 'default', 'saved'];
 				site = req.params.site,
 				type = req.body.type.toLowerCase(),
-            id = req.body.id;
+            id = req.body._id;
 
 		if(models[site] && types.indexOf(req.body.type) > -1) { // update if type is valid and a model for that site exists
 			models[site].findByIdAndUpdate(id, {

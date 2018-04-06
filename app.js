@@ -25,7 +25,7 @@ app.use( bodyParser.urlencoded({extended: true}) );
 
 routes(app); // routes
 // EXPRESS start
-app.listen(5555, function() {
+app.listen(3000, function() {
 	console.log('EXPRESS started listening');
 });
 
