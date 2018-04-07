@@ -6,24 +6,32 @@ const
 var models = require('./models');
 console.log('route ' + !!models.searchData);
 
-var routes = function(app) {
+var routes = function(app, push) {
 
    // HOME ROUTE
 	app.get('/' ,function(req, res) {
 		res.render('home', {data: data});
    });
+
+   // setInterval(function() {
+   //    var randomGen = function(arr) {
+   //       return Math.floor(Math.random() * arr.length);
+   //    }
+   //    push( 'keywords', data.keywords[randomGen(data.keywords)] );
+   //    push( 'cities', data.cities[randomGen(data.cities)] );
+   // }, 3000);
    
    app.get('/settings', function(req, res) {
       res.render('settings', {data: data, runState: data.runData.isRunning});
    });
 
    app.post('/start', function(req, res) { 
-      data.runData.start(helpers.starter, [data, models, helpers.infiniteRepeat]);
+      data.runData.start(helpers.starter, [data, models, helpers.infiniteRepeat], push);
       res.send('The route for starting the runner');
    });
 
    app.post('/stop', function(req, res) {
-      data.runData.cancel();
+      data.runData.cancel(push);
       res.send('The route for stopping the runner');
    });
 

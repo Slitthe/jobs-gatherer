@@ -20,14 +20,15 @@ var jobSchema = new mongoose.Schema({
    }
 });
 
+
 var valueSchema = new mongoose.Schema({
    city: {
-      type: Number,
-      default: 0
+      type: String,
+      default: data.keywords[0]
    },
    keyword: {
-      type: Number,
-      default: 0
+      type: String,
+      default: data.cities[0]
    },
    page: {
       type: Number,
@@ -35,6 +36,8 @@ var valueSchema = new mongoose.Schema({
    },
    site: String
 });
+
+
 
 var searchDataSchema = new mongoose.Schema({
    list: [String],

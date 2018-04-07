@@ -1,27 +1,63 @@
 <% include partials/header %>
 
    <div class='container my-5'>
-      <ul class='list-group mb-5'>
+      <ul class='list-group mb-5' id='keywords'>
          <h2>Keywords</h2>
          <% data.keywords.forEach(function(keyword) { %>
-            <li class='list-group-item'><%=keyword%></li>
+            <li class='list-group-item' data-item='<%= keyword %>'><%=keyword%></li>
          <% }) %>
       </ul>
 
-      <ul class='list-group mb-5'>
+      <ul class='list-group mb-5' id='cities'>
          <h2>Locations</h2>
-         <% data.cities.forEach(function(cities) { %>
-            <li class='list-group-item'><%=cities%></li>
+         <% data.cities.forEach(function(city) { %>
+            <li class='list-group-item' data-item='<%= city %>'><%=city%></li>
          <% }) %>
       </ul>
-      <div>Running state: <%= runState %> </div>
+      <div>Running state: 
+
+         <span class='led led-green state-display'>
+            <span class='state-text'>
+               <% if(runState) {%> 
+                  Running
+               <% } else {%>
+                  Stopped
+               <% } %>
+            </span>
+            <span class='led-body'></span>
+         </span>
+      </div>
       <div class='btn-group'>
          <button class='btn btn-danger'>STOP</button>
          <button class='btn btn-success'>START</button>  
       </div>
+
    </div>
 
    <script>
+      var es = new EventSource('http://localhost:3000/ssedemo');
+
+      es.addEventListener('keywords', function(evt) {
+         $('#keywords [data-item]').removeClass('list-active');
+         $('[data-item="' + evt.data + '"]').addClass('list-active');
+      });
+      es.addEventListener('cities', function(evt) {
+         $('#cities [data-item]').removeClass('list-active');
+         $('[data-item="' + evt.data + '"]').addClass('list-active');
+      });
+      es.addEventListener('stoppedStatus', function(evt) {
+         console.log(evt.data);
+         if(evt.data === 'true') {
+           $('.state-display').removeClass('led-green');
+           $('.state-display').addClass('led-red');
+           $('.state-display .state-text').text('Stopped');
+         } else {
+           $('.state-display').removeClass('led-red');
+           $('.state-display').addClass('led-green');
+           $('.state-display .state-text').text('Running');           
+         }
+      });
+
       $('.btn-danger').on('click', function() {
          $.ajax({
             url: 'http://localhost:3000/stop',

@@ -1,24 +1,25 @@
 const colors = require('colors');
+var push = require('./app').default;
 // what keywords to use
 var exportData = {};
 exportData.keywords = [
    'web developer',
    'front end',
-   'front end developer',
-   'css',
-   'css3',
-   'html',
-   'html5',
-   'bootstrap',
-   'jquery',
-   'javascript',
-   'js',
-   'software developer',
-   'javascript developer',
-   'developer',
-   'programmer',
-   'programator',
-   'it'
+   // 'front end developer',
+   // 'css',
+   // 'css3',
+   // 'html',
+   // 'html5',
+   // 'bootstrap',
+   // 'jquery',
+   // 'javascript',
+   // 'js',
+   // 'software developer',
+   // 'javascript developer',
+   // 'developer',
+   // 'programmer',
+   // 'programator',
+   // 'it'
 ];
 // The cities to search in
 exportData.cities = [
@@ -86,6 +87,11 @@ exportData.runData = {
          clearTimeout(this.runTimeout);
       }
       this.runTimeout = null;
+      if(arguments[0]) {
+         console.log(arguments[0]);
+         
+         arguments[0]('stoppedStatus', 'true');
+      }
       console.log(this.continue, this.runTimeout)
    },
    start: function(runner, args) {
@@ -93,6 +99,9 @@ exportData.runData = {
       if(!this.isRunning) {
          this.continue = true;
          runner.apply(this, args);
+         if (arguments[2]) {
+            arguments[2]('stoppedStatus', 'false');
+         }
       } else {
          console.log('The search is already running');
       }

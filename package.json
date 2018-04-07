@@ -33,6 +33,7 @@
     "express": "^4.16.3",
     "method-override": "^2.3.10",
     "mongoose": "^5.0.11",
-    "request": "^2.85.0"
+    "request": "^2.85.0",
+    "sse-pusher": "^1.1.1"
   }
 }

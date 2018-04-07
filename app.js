@@ -6,7 +6,8 @@ const express = require('express'),
 		request = require('request'),
 		methodOverride = require('method-override'),
       ejs = require('ejs'),
-      bodyParser = require('body-parser');
+      bodyParser = require('body-parser'),
+      ssePusher = require('sse-pusher');
    // Own modules files
 const helpers = require('./helpers'),
       data = require('./data'),
@@ -15,15 +16,17 @@ const helpers = require('./helpers'),
       models = require('./models'),
       routes = require('./routes');
 
+var push = ssePusher();
 // EXPRESS
    // EXPRESS settings
 app.set('view engine', 'ejs');
 app.use( express.static(__dirname + '/public') );
 app.use( methodOverride('_method') );
 app.use( bodyParser.urlencoded({extended: true}) );
+app.use( '/ssedemo', push.handler() );
 
 
-routes(app); // routes
+routes(app, push); // routes
 // EXPRESS start
 app.listen(3000, function() {
 	console.log('EXPRESS started listening');
@@ -40,7 +43,7 @@ app.listen(3000, function() {
 
 
 
-helpers.starter(data, models, helpers.infiniteRepeat);
+helpers.starter(data, models, helpers.infiniteRepeat, push);
 
 
 

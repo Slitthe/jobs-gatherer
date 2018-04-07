@@ -132,8 +132,8 @@ var repeat = function (obj, data, toIncrement, func) {
 var saveValues = function(saveObj) {
    models.value.findOne({ site: saveObj.site }, function (err, data) {
       if (!err && data) {
-         data.keyword = saveObj.queries.index;
-         data.city = saveObj.places.index;
+         data.keyword = saveObj.queries.values[saveObj.queries.index];
+         data.city = saveObj.places.values[saveObj.places.index];
          data.page = saveObj.page;
          data.save();
       } else {
@@ -188,17 +188,18 @@ var btnGroups = function (type) {
 //    });
 // };
 
-var starter = function (data, models, runFunc) {
+var starter = function (data, models, runFunc, push) {
    data.getData(models, function (dataRes) {
       data.sites.forEach(function (site) {
          models.value.findOne({ site: site }, function (err, values) {
             if (!err && values) {
                runFunc({
                   site: site,
-                  queries: { values: dataRes.keywords, index: values.keyword },
-                  places: { values: dataRes.cities, index: values.city },
+                  queries: { values: dataRes.keywords, index: dataRes.keywords.indexOf(values.keyword) },
+                  places: { values: dataRes.cities, index: dataRes.cities.indexOf(values.city) },
                   page: values.page,
-                  tryCount: 1
+                  tryCount: 1,
+                  push: push
                }, data);
 
             } else {
@@ -207,7 +208,8 @@ var starter = function (data, models, runFunc) {
                   queries: { values: dataRes.keywords, index: 0 },
                   places: { values: dataRes.cities, index: 0 },
                   page: 1,
-                  tryCount: 1
+                  tryCount: 1,
+                  push: push
                }, data);
             }
          });
@@ -215,13 +217,13 @@ var starter = function (data, models, runFunc) {
    });
 };
 
-function infiniteRepeat(obj, data) {
+function infiniteRepeat(obj, data, push) {
    if (data.runData.continue) {
       removeExpired(models, data.sites); // remove any expired DB entries
       saveValues(obj); // save indices & page to DB
-
+      
       var url = getUrls(obj.page, obj.queries.values[obj.queries.index], obj.places.values[obj.places.index], obj.site); // req URL
-
+      
       request(url, function (err, response, body) {
          console.log('Request attempt made: , tryCount: ' + obj.tryCount, colors.yellow(url));
          console.log(colors.bgBlack(new Date().getSeconds()))
@@ -235,6 +237,8 @@ function infiniteRepeat(obj, data) {
             if (parsed) { // 1 or more results (otherwise parsed is null)
                console.log(colors.green('Results found, number: ') + parsed.length)
                dbAdd(obj.site, obj.places.values[obj.places.index], parsed);
+               obj.push('keywords', obj.queries.values[obj.queries.index]);
+               obj.push('cities', obj.places.values[obj.places.index]);
 
                obj.page++; // increment the page
                repeat(obj, data, false, infiniteRepeat); // but DO NOT increment queries/places
