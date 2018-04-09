@@ -85,7 +85,7 @@ var routes = function(app, push) {
 		let 	types = ['deleted', 'default', 'saved'];
 				site = req.params.site,
 				type = req.body.type.toLowerCase(),
-            id = req.body._id;
+            id = req.body._id || req.body.id;
 
 		if(models[site] && types.indexOf(req.body.type) > -1) { // update if type is valid and a model for that site exists
 			models[site].findByIdAndUpdate(id, {
