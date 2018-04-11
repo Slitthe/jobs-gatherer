@@ -237,8 +237,8 @@ function infiniteRepeat(obj, data, push) {
             if (parsed) { // 1 or more results (otherwise parsed is null)
                console.log(colors.green('Results found, number: ') + parsed.length)
                dbAdd(obj.site, obj.places.values[obj.places.index], parsed);
-               obj.push('keywords', obj.queries.values[obj.queries.index]);
-               obj.push('cities', obj.places.values[obj.places.index]);
+
+               // obj.push('cities', obj.places.values[obj.places.index]);
 
                obj.page++; // increment the page
                repeat(obj, data, false, infiniteRepeat); // but DO NOT increment queries/places
@@ -250,6 +250,12 @@ function infiniteRepeat(obj, data, push) {
 
                repeat(obj, data, true, infiniteRepeat); // increment the queries/places when there are no results for the current page
             }
+            obj.push('update', {
+               query: obj.queries.values[obj.queries.index],
+               place: obj.places.values[obj.places.index],
+               page: obj.page
+            });
+            
 
          } else {
             // request error

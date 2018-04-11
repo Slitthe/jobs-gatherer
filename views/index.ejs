@@ -22,9 +22,7 @@
                   <ul class='list-group <%= delClass %>' data-city='<%= city %>'>
                      <li class='list-group-item row text-center py-2 text-muted' >
                         <h4><%= city %> 
-                           (<span class='counter'>
-                           <%= results[type][city] ? results[type][city].length : 0 %>
-                           </span>)
+                           (<span class='counter'><%= results[type][city] ? results[type][city].length : 0 %></span>)
                         </h4>
                      </li>
                      <% if(results[type][city]) { %>

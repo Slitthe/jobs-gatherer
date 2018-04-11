@@ -1,22 +1,44 @@
 <% include partials/header %>
 
    <div class='container my-5'>
-      <ul class='list-group mb-5' id='keywords'>
-         <h2>Keywords</h2>
-         <% data.keywords.forEach(function(keyword) { %>
-            <li class='list-group-item' data-item='<%= keyword %>'><%=keyword%></li>
-         <% }) %>
-      </ul>
+      <a class='btn btn-link' href='/'>‹‹ Go Home</a>
+      <div class='row'>
+         <ul class='list-group mb-5 p-1 col-md' id='keywords'>
+            <h2>Keywords</h2>
+            <% data.keywords.forEach(function(keyword) { %>
+               <li class='list-group-item px-1 position-relative py-2' data-item='<%= keyword %>'>
+                  <span class='item-text'><%=keyword%></span>
+                  <button class='remove-item btn btn-danger position-absolute absolute-right'>
+                     <i class='fa fa-trash'></i>
+                  </button>
+               </li>
+            <% }) %>
+         </ul>
+         <ul class='list-group mb-5 p-1 col-md' id='cities'>
+            <h2>Locations</h2>
+            <% data.cities.forEach(function(city) { %>
+               <li class='list-group-item px-1 position-relative py-2' data-item='<%= city %>'>
+                  <span class='item-text'><%=city%></span>
+                  <button class='remove-item btn btn-danger position-absolute absolute-right'>
+                     <i class='fa fa-trash'></i>
+                  </button>
+               </li>
+            <% }) %>
+         </ul>
+         <ul class='list-group mb-5 p-1 col-md' id='cities'>
+            <h2>Page</h2>
+            <li class='list-group-item list-active px-1 position-relative' id='page'></li>
+         </ul>
+      </div>
 
-      <ul class='list-group mb-5' id='cities'>
-         <h2>Locations</h2>
-         <% data.cities.forEach(function(city) { %>
-            <li class='list-group-item' data-item='<%= city %>'><%=city%></li>
-         <% }) %>
-      </ul>
-      <div>Running state: 
 
-         <span class='led led-green state-display'>
+
+
+      <div class='border p-2'> 
+         <% var runClass = runState ? 'led-green' : 'led-red';%>
+         <p>
+         Running state:
+            <span class='led <%= runClass%> state-display'>
             <span class='state-text'>
                <% if(runState) {%> 
                   Running
@@ -25,26 +47,131 @@
                <% } %>
             </span>
             <span class='led-body'></span>
+         </p>
+            <p class='text-muted'>The service must be stopped in order to modify the data</p>
          </span>
+         <div class='btn-group start-stop'>
+            <button class='btn btn-danger stop'>STOP</button>
+            <button class='btn btn-success start'>START</button>  
+         </div>
       </div>
-      <div class='btn-group'>
-         <button class='btn btn-danger'>STOP</button>
-         <button class='btn btn-success'>START</button>  
+
+
+      <div class='my-5 py-3 px-2 border'>
+         <h2>Add value</h2>
+
+         <form class='modify-form' method='POST' action='/update?_method=PUT&add=true' data-add='true'>
+            <div class='form-group'>
+               <label for='name'>Type</label> 
+               <select class='form-control' name='type' id='name'>
+                  <option value='keywords'>Keyword</option>
+                  <option value='cities'>Location</option>
+               </select>
+            </div>
+            <div class='form-group'>
+               <label for='value'>Type</label> 
+               <input class='form-control' type='text' id='value' name='value' placeholder='New value to add.'>
+            </div> 
+            <input class='btn btn-primary' type='submit'>
+
+         <div class="alert alert-danger alert-dismissible show error-container d-none" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+               <span aria-hidden="true">&times;</span>
+            </button>
+            <span class='error-message'></span>
+         </div>
+
+         </form>
       </div>
 
    </div>
 
    <script>
       var es = new EventSource('http://localhost:3000/ssedemo');
+      var isRunning = <%= runState %>
 
-      es.addEventListener('keywords', function(evt) {
-         $('#keywords [data-item]').removeClass('list-active');
-         $('[data-item="' + evt.data + '"]').addClass('list-active');
+      $('.modify-form').submit(function(evt) {
+         evt.preventDefault();
+         var type = $(this).find('#name').val();
+         var value = $(this).find('#value').val();
+         var add = $(this).attr('data-add');
+         var sentData = {};
+         sentData[type] = [value];
+         $.ajax({
+            url: window.location.origin + '/update?_method=PUT' + '&add=' + add,
+            method: 'POST',
+            data: sentData,
+            success: function() {
+               console.log('success');
+               var appendTarget = $('#' + type)
+               var copy = $( appendTarget.children('li').last()[0].outerHTML );
+               copy.attr('data-item', value);
+               appendTarget.append(copy);
+               $('.error-container').addClass('d-none');
+            },
+            error: function(err) {
+               $('.error-container').removeClass('d-none');
+               
+               let errorText = {
+                  alredyRunning: 'The search service must be stopped before making any changes.',
+                  wrongRequest: 'There was a problem with the request being made.'
+               };
+               if(err.responseText) {
+                  $('.error-message').text(errorText[err.responseText]);
+               }
+            }
+         });
       });
-      es.addEventListener('cities', function(evt) {
-         $('#cities [data-item]').removeClass('list-active');
-         $('[data-item="' + evt.data + '"]').addClass('list-active');
+
+      function updateData(data) {
+         $('[data-item]').removeClass('list-active');
+         $('[data-item="' + data.query + '"]').addClass('list-active');
+         $('[data-item="' + data.place + '"]').addClass('list-active');
+         $('#page').html(data.page);
+      }
+      es.addEventListener('update', function(evt) {
+         var data = evt.data ? JSON.parse(evt.data) : null;
+         updateData(data);
       });
+
+      $('.close').on('click', function(){
+         $(this).parent().toggleClass('d-none');
+      });
+
+      $('ul').on('click', '.remove-item', function() {
+         var parent = $(this).parent();
+         var type = parent.parents('ul').attr('id');
+         var value = parent.attr('data-item');
+         var sentData = {};
+         sentData[type] = [value];
+         if(window.confirm('Are you sure you want to remove ' + value + ' from the list?')) {
+            $.ajax({
+               url: window.location.origin + '/update?_method=PUT&add=false',
+               method: 'POST',
+               data: sentData,
+               success: function() {
+                  parent.remove();
+                  $('.error-container').addClass('d-none');
+                  // hide the display message
+               },
+               error: function(err){
+                  $('.error-container').removeClass('d-none');
+                  let errorText = {
+                     alredyRunning: 'The search service must be stopped before making any changes.',
+                     wrongRequest: 'There was a problem with the request being made.'
+                  };
+                  console.log(errorText[err.responseText]);
+                  if(err.responseText) {
+                     $('.error-message').text(errorText[err.responseText]);
+                  }
+               }
+            });
+         }
+
+         
+      });
+
+
       es.addEventListener('stoppedStatus', function(evt) {
          console.log(evt.data);
          if(evt.data === 'true') {
@@ -58,29 +185,38 @@
          }
       });
 
-      $('.btn-danger').on('click', function() {
+      $('.stop').on('click', function() {
          $.ajax({
             url: 'http://localhost:3000/stop',
             type: 'POST',
             success: function() {
-               console.log('stop');
                
-               $('.btn-danger').addClass('active');
-               $('.btn-success').removeClass('active');
+               $('.stop').addClass('active');
+               $('.start').removeClass('active');
             }
          });
       });
-      $('.btn-success').on('click', function() {
+      $('.start').on('click', function() {
          $.ajax({
             url: 'http://localhost:3000/start',
             type: 'POST',
             success: function() {
-               console.log('start');
-               $('.btn-danger').removeClass('active');
-               $('.btn-success').addClass('active');
+               
+               $('.stop').removeClass('active');
+               $('.start').addClass('active');
             }
          });
       });
+      function disableInputs() {
+         if( isRunning ) {
+            $('input, button, select').prop('disabled', 'true');
+            $('.start-stop  button').prop('disabled', '');
+
+         } else {
+            $('input, button, select').prop('disabled', '');
+         }
+      }
+      disableInputs();
    </script>
 
 

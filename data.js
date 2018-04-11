@@ -1,5 +1,4 @@
 const colors = require('colors');
-var push = require('./app').default;
 // what keywords to use
 var exportData = {};
 exportData.keywords = [
@@ -76,31 +75,46 @@ exportData.getData = function(models, callback) {
    });
 };
 
+// exportData.modifyData = function(type, modifyData, models, add) {
+//    if(type === 'keywords' || type === 'cities') {
+//       models.searchData.findOne({type: type}, function(err, data) {
+//          if(!err && data) {
+//             if(add) {
+//                data.list.push(modifyData);
+//             } else {
+//                let index = data.list.indexOf(modifyData);
+//                data.list.splice(index, 1);
+//             }
+//             data.save();
+//          }
+//       });
+//    }
+// }
+
 
 
 exportData.runData = {
    continue: true,
    runTimeout: null,
-   cancel:  function() {
+   cancel:  function(push) {
       this.continue = false;
       if(this.runTimeout) {
          clearTimeout(this.runTimeout);
       }
       this.runTimeout = null;
-      if(arguments[0]) {
-         console.log(arguments[0]);
+      if(push) {
+         console.log(push);
          
-         arguments[0]('stoppedStatus', 'true');
+         push('stoppedStatus', 'true');
       }
       console.log(this.continue, this.runTimeout)
    },
    start: function(runner, args) {
-      console.log(this.isRunning);
       if(!this.isRunning) {
          this.continue = true;
          runner.apply(this, args);
-         if (arguments[2]) {
-            arguments[2]('stoppedStatus', 'false');
+         if (args[3]) {
+            args[3]('stoppedStatus', 'false');
          }
       } else {
          console.log('The search is already running');
@@ -114,6 +128,7 @@ exportData.runData = {
 exportData.updateValues = function (obj, models, add) {
    console.log('Run state: :--> ' + this.runData.isRunning); 
    console.log(colors.cyan(add));
+   console.log(obj, add);
    if(!this.runData.isRunning) { // only modify when the 'requester' isn't running
       Object.keys(obj).forEach(function(type) { // 'obj' is the data object of the POST request
          if( (type === 'keywords' || type === 'cities') && Array.isArray(obj[type])) { // only take into consideration the two types

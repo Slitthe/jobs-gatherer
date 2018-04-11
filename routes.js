@@ -26,31 +26,52 @@ var routes = function(app, push) {
    });
 
    app.post('/start', function(req, res) { 
-      data.runData.start(helpers.starter, [data, models, helpers.infiniteRepeat], push);
+      data.runData.start(helpers.starter, [data, models, helpers.infiniteRepeat, push]);
       res.send('The route for starting the runner');
    });
 
    app.post('/stop', function(req, res) {
+      console.log(!!push)
       data.runData.cancel(push);
       res.send('The route for stopping the runner');
    });
+
+   // app.put('/update', function(req, res) {
+   //    var data = req.body.data ? req.body.data : null;
+   //    if(data && typeof data.updateValue === 'string' && )
+   // });
 
    app.get('/status', function (req, res) {
 
       res.send(data.runData.isRunning);
    });
-   app.post('/updateValue', function (req, res) {
-      var body = req.body;
-      var add = body.add === 'false' || body.add === 'true' ? body.add : undefined;
-      if(add && typeof JSON.parse(body.add) === 'boolean') {
-         add = JSON.parse(add);
-         data.updateValues(body, models, add);
-         res.send('Correct');
+   app.put('/update', function (req, res) {
+      console.log(req.body, req.query);
+      var add = req.query.add === 'false' || req.query.add === 'true' ? req.query.add : null;
+      if(add) {
+         let returnObj = req.body || null;
+         if(!data.runData.isRunning) {
+            console.log('1');
+            data.updateValues(returnObj, models, JSON.parse(add));
+            res.send('success');
+         }
+         else {
+            console.log('2');
+            res.status(400);
+            res.send('alredyRunning');
+         }
       } else {
+         console.log('3');
          res.status(400);
-         res.send('Incorrect request made');
+         res.redirect('wrongRequest');
       }
-   
+
+         
+      //    res.send('Correct');
+      // } else {
+      //    res.status(400);
+      //    res.send('Incorrect request made');
+      // }
    });
 
    // 'site' INDEX PAGE
@@ -85,7 +106,7 @@ var routes = function(app, push) {
 		let 	types = ['deleted', 'default', 'saved'];
 				site = req.params.site,
 				type = req.body.type.toLowerCase(),
-            id = req.body._id;
+            id = req.body._id || req.body.id;
 
 		if(models[site] && types.indexOf(req.body.type) > -1) { // update if type is valid and a model for that site exists
 			models[site].findByIdAndUpdate(id, {

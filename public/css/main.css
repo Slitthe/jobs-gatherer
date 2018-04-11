@@ -23,19 +23,20 @@
    background: rgba(87%, 87%, 87%, 0.95);
 }
 
-.btn-group {
+.btn-group, .absolute-right {
    right: 5px;
    top: 5px;
    bottom: 5px;
    z-index: 999;
 }
 
+   
 .result-type {
    margin-bottom: 150px;
 }
 
 .list-active {
-   background: yellow;
+   background: rgba(218, 232, 101, 0.32);
 }
 
 .led-green {
@@ -49,6 +50,10 @@
 }
 .led-red .led-body {
    background-color: rgba(230, 70, 40, 0.7);
+}
+
+.info:empty {
+   display: none;
 }
 
 
