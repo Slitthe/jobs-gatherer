@@ -266,7 +266,7 @@
 
       $('.stop').on('click', function() {
          $.ajax({
-            url: 'http://localhost:3000/stop',
+            url: window.location.origin + '/stop',
             type: 'POST',
             success: function() {
                window.runState.isRunning = false; 
@@ -277,7 +277,7 @@
       });
       $('.start').on('click', function() {
          $.ajax({
-            url: 'http://localhost:3000/start',
+            url: window.location.origin + '/start',
             type: 'POST',
             success: function() {
                window.runState.isRunning = true;
