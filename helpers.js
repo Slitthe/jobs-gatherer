@@ -123,9 +123,9 @@ var repeat = function (obj, data, toIncrement, func) {
    };
    
 
-   data.runData.runTimeout = setTimeout(function () {
+   data.runData.runTimeout.push( setTimeout(function () {
       func(obj, data);
-   }, randomRange(10000, 10000)); //230000, 380000
+   }, randomRange(10000, 10000)) ); //230000, 380000
 };
 
 // save the current search location values to the DB
@@ -253,7 +253,8 @@ function infiniteRepeat(obj, data, push) {
             obj.push('update', {
                query: obj.queries.values[obj.queries.index],
                place: obj.places.values[obj.places.index],
-               page: obj.page
+               page: obj.page,
+               site: obj.site
             });
             
 

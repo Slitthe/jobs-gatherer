@@ -2,6 +2,25 @@
 
    <div class='container my-5'>
       <a class='btn btn-link' href='/'>‹‹ Go Home</a>
+      <div class='status'>
+         <h2 class='mb-0' >Live search status</h2>
+         <table class='table table-bordered my-5'>
+            <tr>
+               <th class='bg-light'>Site</th>
+               <th>Keywords</th>
+               <th>Location</th>
+               <th>Page</th>
+            </tr>
+            <% data.sites.forEach(function(site) { %>
+               <tr data-site='<%= site%>'>
+                  <td class='bg-light'><%= site%></td>
+                  <td data-status='keyword'></td>
+                  <td data-status='location'></td>
+                  <td data-status='page'></td>
+               </tr>
+            <% }); %>
+         </table>
+      </div>
       <div class='row'>
          <ul class='list-group mb-5 p-1 col-md' id='keywords'>
             <h2>Keywords</h2>
@@ -70,7 +89,7 @@
             </div>
             <div class='form-group'>
                <label for='value'>Type</label> 
-               <input class='form-control' type='text' id='value' name='value' placeholder='New value to add.'>
+               <input class='form-control' type='text' id='value' name='value' placeholder='New value to add.' minlength='1' maxlength='60' required>
             </div> 
             <input class='btn btn-primary' type='submit'>
 
@@ -84,17 +103,49 @@
          </form>
       </div>
 
+      
    </div>
 
    <script>
       var es = new EventSource('http://localhost:3000/ssedemo');
-      var isRunning = <%= runState %>
+
+      function disableInputs() {
+         if( runState.isRunning ) {
+            $('input, button:not(.close), select').prop('disabled', 'true');
+            $('.start-stop  button').prop('disabled', '');
+
+         } else {
+            $('input, button, select').prop('disabled', '');
+         }
+      }
+
+      var sitesColors = {      <% Object.keys(data.sitesColors).forEach(function(site, index, arr) { %>
+         <% let color = data.sitesColors[site]%>
+         <% let comma = index !== arr.length - 1 ? ',' : '';%>
+         '<%= site %>': '<%= color%>'<%= comma %>
+      <% }) %>};
+
+
+      var runState = {
+         value: <%= runState %>
+      };
+
+      Object.defineProperty(runState, 'isRunning', {
+         get: function() {
+            return this.value;
+         },
+         set: function(value) {
+            this.value = value;
+            return disableInputs();
+         }
+      });
 
       $('.modify-form').submit(function(evt) {
          evt.preventDefault();
          var type = $(this).find('#name').val();
          var value = $(this).find('#value').val();
          var add = $(this).attr('data-add');
+         console.log(type, value, add);
          var sentData = {};
          sentData[type] = [value];
          $.ajax({
@@ -103,9 +154,12 @@
             data: sentData,
             success: function() {
                console.log('success');
-               var appendTarget = $('#' + type)
+               var appendTarget = $('#' + type);
                var copy = $( appendTarget.children('li').last()[0].outerHTML );
                copy.attr('data-item', value);
+               copy.find('.item-text').text(value);
+               console.log(copy);
+               
                appendTarget.append(copy);
                $('.error-container').addClass('d-none');
             },
@@ -124,10 +178,35 @@
       });
 
       function updateData(data) {
-         $('[data-item]').removeClass('list-active');
-         $('[data-item="' + data.query + '"]').addClass('list-active');
-         $('[data-item="' + data.place + '"]').addClass('list-active');
-         $('#page').html(data.page);
+         // query, place, page, site
+
+         // data-site = site
+         // add the data site=site to corresponding item
+         // ignore other data site entries
+         // remove data-site=site from any other entry
+         // [data-site='data.site']
+         console.log(data);
+         var target = $( '[data-site="' + data.site + '"]');
+         console.log(target);
+         var targets = [
+            [target.find('[data-status="keyword"]'), data.query],
+            [target.find('[data-status="location"]'), data.place],
+            [target.find('[data-status="page"]'), data.page],
+         ];
+
+         targets.forEach(function(target) {
+            if(target[0].text() !== target[1]) {
+               target[0].css('background', 'rgba(173, 173, 255, 0.4)');
+               setTimeout(function() {
+                  target[0].css('background', 'transparent');
+               }, 2000);
+            }
+         });
+
+         targets.forEach(function(target) {
+            target[0].text(target[1]);
+         });
+        
       }
       es.addEventListener('update', function(evt) {
          var data = evt.data ? JSON.parse(evt.data) : null;
@@ -190,7 +269,7 @@
             url: 'http://localhost:3000/stop',
             type: 'POST',
             success: function() {
-               
+               window.runState.isRunning = false; 
                $('.stop').addClass('active');
                $('.start').removeClass('active');
             }
@@ -201,21 +280,13 @@
             url: 'http://localhost:3000/start',
             type: 'POST',
             success: function() {
-               
+               window.runState.isRunning = true;
                $('.stop').removeClass('active');
                $('.start').addClass('active');
             }
          });
       });
-      function disableInputs() {
-         if( isRunning ) {
-            $('input, button, select').prop('disabled', 'true');
-            $('.start-stop  button').prop('disabled', '');
 
-         } else {
-            $('input, button, select').prop('disabled', '');
-         }
-      }
       disableInputs();
    </script>
 

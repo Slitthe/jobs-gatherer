@@ -4,21 +4,21 @@ var exportData = {};
 exportData.keywords = [
    'web developer',
    'front end',
-   // 'front end developer',
-   // 'css',
-   // 'css3',
-   // 'html',
-   // 'html5',
-   // 'bootstrap',
-   // 'jquery',
-   // 'javascript',
-   // 'js',
-   // 'software developer',
-   // 'javascript developer',
-   // 'developer',
-   // 'programmer',
-   // 'programator',
-   // 'it'
+   'front end developer',
+   'css',
+   'css3',
+   'html',
+   'html5',
+   'bootstrap',
+   'jquery',
+   'javascript',
+   'js',
+   'software developer',
+   'javascript developer',
+   'developer',
+   'programmer',
+   'programator',
+   'it'
 ];
 // The cities to search in
 exportData.cities = [
@@ -28,10 +28,14 @@ exportData.cities = [
 
 // The sites to search in
 exportData.sites = [
-   'ejobs'
-   // 'bestjobs'
+   'ejobs',
+   'bestjobs'
 ];
 
+exportData.sitesColors = {
+   ejobs: 'rgba(63, 110, 227, 0.5)',
+   bestjobs: 'rgba(202, 143, 44, 0.5)',
+};
 
 exportData.types = [
    'saved',
@@ -75,39 +79,23 @@ exportData.getData = function(models, callback) {
    });
 };
 
-// exportData.modifyData = function(type, modifyData, models, add) {
-//    if(type === 'keywords' || type === 'cities') {
-//       models.searchData.findOne({type: type}, function(err, data) {
-//          if(!err && data) {
-//             if(add) {
-//                data.list.push(modifyData);
-//             } else {
-//                let index = data.list.indexOf(modifyData);
-//                data.list.splice(index, 1);
-//             }
-//             data.save();
-//          }
-//       });
-//    }
-// }
 
 
 
 exportData.runData = {
    continue: true,
-   runTimeout: null,
+   runTimeout: [],
    cancel:  function(push) {
       this.continue = false;
-      if(this.runTimeout) {
-         clearTimeout(this.runTimeout);
+      if(this.runTimeout.length) {
+         this.runTimeout.forEach(function(crTimeout) {
+            clearTimeout(crTimeout);
+         });
       }
-      this.runTimeout = null;
+      this.runTimeout = [];
       if(push) {
-         console.log(push);
-         
          push('stoppedStatus', 'true');
       }
-      console.log(this.continue, this.runTimeout)
    },
    start: function(runner, args) {
       if(!this.isRunning) {

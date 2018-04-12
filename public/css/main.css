@@ -69,3 +69,7 @@
 .led, .led-body {
    display: inline-block;
 }
+
+[data-status] {
+   transition: 0.7s all linear;
+}
