@@ -4,7 +4,7 @@
       <a class='btn btn-link' href='/'>‹‹ Go Home</a>
       <div class='status'>
          <h2 class='mb-0' >Live search status</h2>
-         <table class='table table-bordered my-5'>
+         <table class='table table-bordered my-5 row-margin'>
             <tr>
                <th class='bg-light'>Site</th>
                <th>Keywords</th>
@@ -22,7 +22,7 @@
          </table>
       </div>
       <div class='row'>
-         <ul class='list-group mb-5 p-1 col-md' id='keywords'>
+         <ul class='list-group mb-5 col-md' id='keywords'>
             <h2>Keywords</h2>
             <% data.keywords.forEach(function(keyword) { %>
                <li class='list-group-item px-1 position-relative py-2' data-item='<%= keyword %>'>
@@ -33,7 +33,7 @@
                </li>
             <% }) %>
          </ul>
-         <ul class='list-group mb-5 p-1 col-md' id='cities'>
+         <ul class='list-group mb-5 col-md' id='cities'>
             <h2>Locations</h2>
             <% data.cities.forEach(function(city) { %>
                <li class='list-group-item px-1 position-relative py-2' data-item='<%= city %>'>
@@ -44,16 +44,19 @@
                </li>
             <% }) %>
          </ul>
-         <ul class='list-group mb-5 p-1 col-md' id='cities'>
-            <h2>Page</h2>
-            <li class='list-group-item list-active px-1 position-relative' id='page'></li>
-         </ul>
+      </div>
+
+      <div class="alert alert-danger alert-dismissible show error-container d-none" role="alert">
+         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+         </button>
+         <span class='error-message'></span>
       </div>
 
 
 
 
-      <div class='border p-2'> 
+      <div class='border p-2 row-margin'> 
          <% var runClass = runState ? 'led-green' : 'led-red';%>
          <p>
          Running state:
@@ -76,7 +79,7 @@
       </div>
 
 
-      <div class='my-5 py-3 px-2 border'>
+      <div class='my-5 py-3 px-2 border row-margin'>
          <h2>Add value</h2>
 
          <form class='modify-form' method='POST' action='/update?_method=PUT&add=true' data-add='true'>
@@ -89,206 +92,24 @@
             </div>
             <div class='form-group'>
                <label for='value'>Type</label> 
-               <input class='form-control' type='text' id='value' name='value' placeholder='New value to add.' minlength='1' maxlength='60' required>
+               <input class='form-control' type='text' id='value' name='value' placeholder='New value to add.'  required>
             </div> 
+            <!--minlength='1' maxlength='60' -->
             <input class='btn btn-primary' type='submit'>
 
-         <div class="alert alert-danger alert-dismissible show error-container d-none" role="alert">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-               <span aria-hidden="true">&times;</span>
-            </button>
-            <span class='error-message'></span>
-         </div>
+
 
          </form>
       </div>
 
-      
    </div>
 
    <script>
-      var es = new EventSource(window.location.origin + '/ssedemo');
-
-      function disableInputs() {
-         if( runState.isRunning ) {
-            $('input, button:not(.close), select').prop('disabled', 'true');
-            $('.start-stop  button').prop('disabled', '');
-
-         } else {
-            $('input, button, select').prop('disabled', '');
-         }
-      }
-
-      var sitesColors = {      <% Object.keys(data.sitesColors).forEach(function(site, index, arr) { %>
-         <% let color = data.sitesColors[site]%>
-         <% let comma = index !== arr.length - 1 ? ',' : '';%>
-         '<%= site %>': '<%= color%>'<%= comma %>
-      <% }) %>};
-
-
       var runState = {
          value: <%= runState %>
       };
-
-      Object.defineProperty(runState, 'isRunning', {
-         get: function() {
-            return this.value;
-         },
-         set: function(value) {
-            this.value = value;
-            return disableInputs();
-         }
-      });
-
-      $('.modify-form').submit(function(evt) {
-         evt.preventDefault();
-         var type = $(this).find('#name').val();
-         var value = $(this).find('#value').val();
-         var add = $(this).attr('data-add');
-         console.log(type, value, add);
-         var sentData = {};
-         sentData[type] = [value];
-         $.ajax({
-            url: window.location.origin + '/update?_method=PUT' + '&add=' + add,
-            method: 'POST',
-            data: sentData,
-            success: function() {
-               console.log('success');
-               var appendTarget = $('#' + type);
-               var copy = $( appendTarget.children('li').last()[0].outerHTML );
-               copy.attr('data-item', value);
-               copy.find('.item-text').text(value);
-               console.log(copy);
-               
-               appendTarget.append(copy);
-               $('.error-container').addClass('d-none');
-            },
-            error: function(err) {
-               $('.error-container').removeClass('d-none');
-               
-               let errorText = {
-                  alredyRunning: 'The search service must be stopped before making any changes.',
-                  wrongRequest: 'There was a problem with the request being made.'
-               };
-               if(err.responseText) {
-                  $('.error-message').text(errorText[err.responseText]);
-               }
-            }
-         });
-      });
-
-      function updateData(data) {
-         // query, place, page, site
-
-         // data-site = site
-         // add the data site=site to corresponding item
-         // ignore other data site entries
-         // remove data-site=site from any other entry
-         // [data-site='data.site']
-         console.log(data);
-         var target = $( '[data-site="' + data.site + '"]');
-         console.log(target);
-         var targets = [
-            [target.find('[data-status="keyword"]'), data.query],
-            [target.find('[data-status="location"]'), data.place],
-            [target.find('[data-status="page"]'), data.page],
-         ];
-
-         targets.forEach(function(target) {
-            if(target[0].text() !== target[1]) {
-               target[0].css('background', 'rgba(173, 173, 255, 0.4)');
-               setTimeout(function() {
-                  target[0].css('background', 'transparent');
-               }, 2000);
-            }
-         });
-
-         targets.forEach(function(target) {
-            target[0].text(target[1]);
-         });
-        
-      }
-      es.addEventListener('update', function(evt) {
-         var data = evt.data ? JSON.parse(evt.data) : null;
-         updateData(data);
-      });
-
-      $('.close').on('click', function(){
-         $(this).parent().toggleClass('d-none');
-      });
-
-      $('ul').on('click', '.remove-item', function() {
-         var parent = $(this).parent();
-         var type = parent.parents('ul').attr('id');
-         var value = parent.attr('data-item');
-         var sentData = {};
-         sentData[type] = [value];
-         if(window.confirm('Are you sure you want to remove ' + value + ' from the list?')) {
-            $.ajax({
-               url: window.location.origin + '/update?_method=PUT&add=false',
-               method: 'POST',
-               data: sentData,
-               success: function() {
-                  parent.remove();
-                  $('.error-container').addClass('d-none');
-                  // hide the display message
-               },
-               error: function(err){
-                  $('.error-container').removeClass('d-none');
-                  let errorText = {
-                     alredyRunning: 'The search service must be stopped before making any changes.',
-                     wrongRequest: 'There was a problem with the request being made.'
-                  };
-                  console.log(errorText[err.responseText]);
-                  if(err.responseText) {
-                     $('.error-message').text(errorText[err.responseText]);
-                  }
-               }
-            });
-         }
-
-         
-      });
-
-
-      es.addEventListener('stoppedStatus', function(evt) {
-         console.log(evt.data);
-         if(evt.data === 'true') {
-           $('.state-display').removeClass('led-green');
-           $('.state-display').addClass('led-red');
-           $('.state-display .state-text').text('Stopped');
-         } else {
-           $('.state-display').removeClass('led-red');
-           $('.state-display').addClass('led-green');
-           $('.state-display .state-text').text('Running');           
-         }
-      });
-
-      $('.stop').on('click', function() {
-         $.ajax({
-            url: window.location.origin + '/stop',
-            type: 'POST',
-            success: function() {
-               window.runState.isRunning = false; 
-               $('.stop').addClass('active');
-               $('.start').removeClass('active');
-            }
-         });
-      });
-      $('.start').on('click', function() {
-         $.ajax({
-            url: window.location.origin + '/start',
-            type: 'POST',
-            success: function() {
-               window.runState.isRunning = true;
-               $('.stop').removeClass('active');
-               $('.start').addClass('active');
-            }
-         });
-      });
-
-      disableInputs();
    </script>
+   <script src='/js/settings.js'></script>
 
 
 <% include partials/footer %>

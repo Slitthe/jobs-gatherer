@@ -1,6 +1,6 @@
 var buttonCreators = function (type, cls, iType) {
    var buttonHtml = '<button type="button" class="px-3 btn btn-' + type + ' ' + cls;
-   buttonHtml += '"> <i class="fa fa-' + iType + '"></i></button>'
+   buttonHtml += '"> <i class="fa fa-' + iType + '"></i></button>';
 
    return buttonHtml;
 };
@@ -23,14 +23,13 @@ var updateCounters = function() {
    var counters = $('.counter');
    Array.prototype.forEach.call(counters, function(counter) {
       
-      var l = $(counter).parents('.list-group-item').nextAll('.list-group-item').length;
+      var l = $(counter).parents('.list-group-item').nextAll('.result').length;
       $(counter).html(l);
       
    });
 };
 
 $.ajaxSetup({
-   url: window.location.href + '?_method=PUT',
    method: 'POST'
 });
 
@@ -43,7 +42,8 @@ $('.func-btns').on('click', '.save-btn', function () {
    let city = parent.parents('.list-group').attr('data-city');
    let category = parent.parents('.result-type').attr('data-category');
    $.ajax({
-      data: { type: 'saved', id: id },
+      url: window.location.href + '/' + id + '?_method=PUT',
+      data: { type: 'saved'},
       success: function () {
          parent.find('.btn-group').html(btnGroups.saved);
          let target = $('[data-category="saved"]' + ' [data-city="' + city + '"]');
@@ -64,6 +64,7 @@ $('.func-btns').on('click', '.delete-btn', function(){
    let city = parent.parents('.list-group').attr('data-city');
    let category = parent.parents('.result-type').attr('data-category');
    $.ajax({
+      url: window.location.href + '/' + id + '?_method=PUT',
       data: { type: 'deleted', id: id},
       success: function() { 
          parent.find('.btn-group').html(btnGroups.deleted);
@@ -76,7 +77,6 @@ $('.func-btns').on('click', '.delete-btn', function(){
          
       },
       error: function() {
-         console.log('Deletion error');
       }
    });
 });
@@ -84,10 +84,6 @@ $('.func-btns').on('click', '.delete-btn', function(){
 
 
 
-// $('.list-group-item').on('mouseover', function(evt){
-//    console.log(this);
-//    this.focus();
-// });
 
 
 // Restore
@@ -97,6 +93,7 @@ $('.func-btns').on('click', '.restore-btn', function () {
    let city = parent.parents('.list-group').attr('data-city');
    let category = parent.parents('.result-type').attr('data-category');
    $.ajax({
+      url: window.location.href + '/' + id + '?_method=PUT',
       data: { type: 'default', id: id },
       success: function () {
          parent.find('.btn-group').html(btnGroups.default);
@@ -114,7 +111,8 @@ $('.func-btns').on('click', '.restore-btn', function () {
 
 // Hidden toggler
 $('.toggle-hidden-next').on('click', function() {
-   $(this).next().toggleClass('d-none');
+   let parent = $(this).parent();
+   console.log( parent.nextAll('li').toggleClass('d-none') );
 });
 
 

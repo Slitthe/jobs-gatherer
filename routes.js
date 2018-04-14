@@ -1,80 +1,102 @@
-const 
-      data = require('./data'),
+const data = require('./data'),
       helpers = require('./helpers'),
-      bodyParser = require('body-parser');
-
-var models = require('./models');
-console.log('route ' + !!models.searchData);
+      models = require('./models');
 
 var routes = function(app, push) {
 
-   // HOME ROUTE
+   // Home
 	app.get('/' ,function(req, res) {
-		res.render('home', {data: data});
+		res.render('home', {sites: data.sites});
    });
 
-   // setInterval(function() {
-   //    var randomGen = function(arr) {
-   //       return Math.floor(Math.random() * arr.length);
-   //    }
-   //    push( 'keywords', data.keywords[randomGen(data.keywords)] );
-   //    push( 'cities', data.cities[randomGen(data.cities)] );
-   // }, 3000);
-   
+   // Settings
    app.get('/settings', function(req, res) {
       res.render('settings', {data: data, runState: data.runData.isRunning});
    });
 
-   app.post('/start', function(req, res) { 
-      data.runData.start(helpers.starter, [data, models, helpers.infiniteRepeat, push]);
-      res.send('The route for starting the runner');
+   app.post('/runAction', function(req, res) {
+      console.log(req.body);
+
+      let action = req.body.action || null;
+      if(action === 'stop' || action === 'start') {
+         if(action === 'start') {
+            data.runData.start(helpers.starter, [data, models, helpers.infiniteRepeat, push]);
+         } else {
+            data.runData.cancel(push);
+         }
+         res.send('');
+      } else { // action is any other string other than 'stop' or 'start' or simply doesn't exist
+         res.status(400);
+         res.send('');
+      }
    });
 
-   app.post('/stop', function(req, res) {
-      console.log(!!push)
-      data.runData.cancel(push);
-      res.send('The route for stopping the runner');
-   });
-
-   // app.put('/update', function(req, res) {
-   //    var data = req.body.data ? req.body.data : null;
-   //    if(data && typeof data.updateValue === 'string' && )
-   // });
-
-   app.get('/status', function (req, res) {
-
-      res.send(data.runData.isRunning);
-   });
+   // add/remove a value
    app.put('/update', function (req, res) {
-      console.log(req.body, req.query);
+      // data format corectness checker
       var add = req.query.add === 'false' || req.query.add === 'true' ? req.query.add : null;
-      if(add) {
-         let returnObj = req.body || null;
+      var correctData = req.body && req.body.hasOwnProperty('type') && typeof req.body.type === 'string';
+      correctData = correctData && req.body.hasOwnProperty('value') && typeof req.body.value === 'string';
+
+      // only proceeds if the data is correct
+      if(add && correctData) {
+         let type = req.body.type;
+         let value = req.body.value;
+
+         // doesn't modify if the search service is running
          if(!data.runData.isRunning) {
-            console.log('1');
-            data.updateValues(returnObj, models, JSON.parse(add));
-            res.send('success');
+            let dataLength = data[type] ? data[type].length : 0; 
+            let valueLength = value.length;
+            if (valueLength > 60 || valueLength === 0) { // too long data or inexistent (0 length)
+               res.status(400);
+               res.send('wrongLength');
+            }
+            else if (add === 'true' || (add === 'false' && dataLength > 1) ) {
+               // every piece of data was the correct format/length
+               let returnObj = {};
+               returnObj[type] = [value];
+               data.updateValues(returnObj, models, JSON.parse(add));
+               res.send('success');
+            } else { // doesn't allow for the deletion of the last item in the category
+               res.status(400);
+               res.send('lastItem');
+            }
          }
          else {
-            console.log('2');
             res.status(400);
             res.send('alredyRunning');
          }
       } else {
-         console.log('3');
          res.status(400);
          res.redirect('wrongRequest');
       }
-
-         
-      //    res.send('Correct');
-      // } else {
-      //    res.status(400);
-      //    res.send('Incorrect request made');
-      // }
    });
 
-   // 'site' INDEX PAGE
+   // update the category of a rersult
+   app.put('/:site/:id', function(req, res) { 
+      let 	types = ['deleted', 'default', 'saved'];
+            site = req.params.site,
+            type = req.body.type.toLowerCase(),
+            id = req.params.id;
+
+      if(models[site] && types.indexOf(req.body.type) > -1) { // update if type is valid and a model for that site exists
+         models[site].findByIdAndUpdate(id, { // update that entry with the new category
+            $set: {
+            filterCat: type
+         }
+      }, function(err, data) { // handle errors and respond to the request so the Front End AJAX can handle changes
+            if(!err) {
+               console.log('Updated ' + Date.now()); // update the expiry date
+               res.send('Updated')
+            } else {
+               res.status(401);
+               res.send('');
+            }
+         });
+      }
+   });
+
+   // index page for the results, site specific
 	app.get('/:site', function(req, res) {
       var site = req.params.site;
       
@@ -87,12 +109,9 @@ var routes = function(app, push) {
                   var splitData = helpers.dataSplitter(results);
                   // index template render
 						res.render('index', {results: splitData, site: site, data: data, btnGroups: helpers.btnGroups});
-					} else {
-                  // 0 results in the DB
-						res.send('<p style="text-align: center;">No Results</p>')
 					}
 				} else { // Communication to DB error
-               res.send('<p style="text-align: center;">Error communicating with the Database</p>');
+               res.send('<p style="text-align: center;">Error fetching the results</p>');
 				}
 			});
 		} else { // wrong URL
@@ -102,28 +121,6 @@ var routes = function(app, push) {
    
 
    // Category modifier (saved, default or deleted)
-	app.put('/:site', function(req, res) { 
-		let 	types = ['deleted', 'default', 'saved'];
-				site = req.params.site,
-				type = req.body.type.toLowerCase(),
-            id = req.body._id || req.body.id;
-
-		if(models[site] && types.indexOf(req.body.type) > -1) { // update if type is valid and a model for that site exists
-			models[site].findByIdAndUpdate(id, {
-            $set: {
-            filterCat: type
-         }
-      }, function(err, data) { // handle errors and respond to the request so the Front End AJAX can handle changes
-            if(!err) {
-               console.log('Updated ' + Date.now());
-               res.send('Updated')
-            } else {
-               res.status(401);
-            }
-         });
-		}
-   });
-   
 
 };
 

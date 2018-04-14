@@ -12,7 +12,7 @@ var getUrls = function () {
 
       site = site.toLowerCase();
       query = encodeURI(query); // make the keyword URL-friendly
-      var siteUrls = { // constructors
+      var siteUrls = { // URL constructors for each site
          ejobs: function(){
             return urls.ejobs + city + '/' + query + '/page' + page + '/';
          },

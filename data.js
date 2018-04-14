@@ -61,7 +61,6 @@ exportData.getData = function(models, callback) {
          callback(exportData);
         
          if(!dbResults.length) {
-            console.log(resData);
             
             Object.keys(resData).forEach(function(resDataKey) {
                models.searchData.create({
@@ -114,14 +113,11 @@ exportData.runData = {
 };
 
 exportData.updateValues = function (obj, models, add) {
-   console.log('Run state: :--> ' + this.runData.isRunning); 
-   console.log(colors.cyan(add));
-   console.log(obj, add);
-   if(!this.runData.isRunning) { // only modify when the 'requester' isn't running
-      Object.keys(obj).forEach(function(type) { // 'obj' is the data object of the POST request
+   if(!this.runData.isRunning) { // only modify when the app isn't running
+      Object.keys(obj).forEach(function(type) { // loop trough the data sent in the POST request
          if( (type === 'keywords' || type === 'cities') && Array.isArray(obj[type])) { // only take into consideration the two types
-            obj[type] = obj[type].filter(function(currentItem) {
-               return typeof currentItem === 'string' && currentItem.length <= 60 && currentItem; // simple data sanitizer
+            obj[type] = obj[type].filter(function(currentItem) { // data sanitizer
+               return typeof currentItem === 'string' && currentItem.length <= 60 && currentItem; 
             });
             obj[type] = obj[type].map(function(item) { // string lowercaser (after only strings were kept)
                return item.toLowerCase();
@@ -129,23 +125,22 @@ exportData.updateValues = function (obj, models, add) {
             
             models.searchData.findOne({type: type}, function(err, dbRes) { // access the DB data
                if (!err && dbRes) { // check for errors
-                  obj[type].forEach(function (item) {
-                     console.log(typeof add);
-                     if(add) {
-                        if(dbRes.list.indexOf(item) === -1) {
+                  obj[type].forEach(function (item) { // loop through the items in the POST request
+                     if(add) { // add functionality
+                        if(dbRes.list.indexOf(item) === -1) { // check for duplicates
                            dbRes.list.push(item.toLowerCase());
                         }                        
-                     } else {
-                        var index = dbRes.list.indexOf(item);
-                        if(index !== -1) {
+                     } else { // remove functionality
+                        var index = dbRes.list.indexOf(item); // find the index of the item to be removed
+                        if(index !== -1) { // if index === -1, then the item doesn't exist
                            dbRes.list.splice(index, 1);
                         }  
                      }
 
                   });
                   console.log(colors.cyan('THIS IS THE DBRES LIST:-->>'), dbRes.list);
-                  exportData[type] = dbRes.list;
-                  dbRes.save();
+                  exportData[type] = dbRes.list; // synchronizes the values in the memory and the DB
+                  dbRes.save(); // saves the DB entry
                }
             });
       

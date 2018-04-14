@@ -9,25 +9,23 @@
 
          <div class='result-type' data-category='<%= type %>'> 
             <%= // type container %>
-            <h3 class='text-center'> <%= type[0].toUpperCase() + type.substring(1)%></h3> 
+            <h3 class='text-center bg-info text-white row-margin py-2'> <%= type[0].toUpperCase() + type.substring(1)%></h3> 
 
                <% data.cities.forEach(function(city) { %>
-                  <% var delClass = type === 'deleted' ? 'd-none deleted-results': '' %>
-                  <% if(delClass) { %>
-                     <h3 class='text-muted'>
-                        <%= city %>
-                     </h3>
-                     <button class='toggle-hidden-next btn btn-secondary'>&#9660</button>
-                  <% } %>
-                  <ul class='list-group <%= delClass %>' data-city='<%= city %>'>
-                     <li class='list-group-item row text-center py-2 text-muted' >
+                  <% var delClass = type === 'deleted' ? 'd-none deleted-result': '' %>
+
+                  <ul class='list-group mb-5' data-city='<%= city %>'>
+                     <li class='list-group-item row text-center py-2 text-white bg-dark' >
                         <h4><%= city %> 
                            (<span class='counter'><%= results[type][city] ? results[type][city].length : 0 %></span>)
                         </h4>
                      </li>
+                        <li class='list-group-item row'>
+                           <button class='toggle-hidden-next btn btn-block btn-secondary'>&#9660</button>
+                        </li>
                      <% if(results[type][city]) { %>
                         <% results[type][city].forEach(function(result) { %>
-                        <li class='list-group-item row position-relative' tabindex='-1'>
+                        <li class='list-group-item row position-relative d-none result' tabindex='-1'>
                            <a class='col-xs-8 result-item' href='<%= result.url %>' target='_blank'>
                               <%= result.title %>
                            </a>

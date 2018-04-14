@@ -4,7 +4,6 @@ var getUrls = require('./urlConstructor');
 var parse = require('./parser');
 var request = require('request');
 var colors = require('colors');
-console.log('help '  + !!models.searchData);
 // Simple pseudo-random numbers range generator [start, finish] (includes extremities)
 var randomRange = function (start, finish) {
    const difference = finish - start;
@@ -193,10 +192,14 @@ var starter = function (data, models, runFunc, push) {
       data.sites.forEach(function (site) {
          models.value.findOne({ site: site }, function (err, values) {
             if (!err && values) {
+               let cityIndex = dataRes.cities.indexOf(values.city);
+               cityIndex = cityIndex !== -1 ? cityIndex : 0;
+               let keywordIndex = dataRes.keywords.indexOf(values.keyword);
+               keywordIndex = keywordIndex !== -1 ? keywordIndex : 0;
                runFunc({
                   site: site,
-                  queries: { values: dataRes.keywords, index: dataRes.keywords.indexOf(values.keyword) },
-                  places: { values: dataRes.cities, index: dataRes.cities.indexOf(values.city) },
+                  queries: { values: dataRes.keywords, index: keywordIndex },
+                  places: { values: dataRes.cities, index: cityIndex },
                   page: values.page,
                   tryCount: 1,
                   push: push
@@ -218,6 +221,7 @@ var starter = function (data, models, runFunc, push) {
 };
 
 function infiniteRepeat(obj, data, push) {
+   
    if (data.runData.continue) {
       removeExpired(models, data.sites); // remove any expired DB entries
       saveValues(obj); // save indices & page to DB
@@ -225,8 +229,6 @@ function infiniteRepeat(obj, data, push) {
       var url = getUrls(obj.page, obj.queries.values[obj.queries.index], obj.places.values[obj.places.index], obj.site); // req URL
       
       request(url, function (err, response, body) {
-         console.log('Request attempt made: , tryCount: ' + obj.tryCount, colors.yellow(url));
-         console.log(colors.bgBlack(new Date().getSeconds()))
 
          if (!err && response.statusCode === 200) { // successful request
             obj.tryCount = 1;
@@ -235,7 +237,6 @@ function infiniteRepeat(obj, data, push) {
                site: obj.site
             }); // parsed HTML request to extract the jobs listing (if any)
             if (parsed) { // 1 or more results (otherwise parsed is null)
-               console.log(colors.green('Results found, number: ') + parsed.length)
                dbAdd(obj.site, obj.places.values[obj.places.index], parsed);
 
                // obj.push('cities', obj.places.values[obj.places.index]);
@@ -244,7 +245,6 @@ function infiniteRepeat(obj, data, push) {
                repeat(obj, data, false, infiniteRepeat); // but DO NOT increment queries/places
             } else {
                // no results found
-               console.log(colors.red('No results found'));
 
                obj.page = 1; // reset the page
 
