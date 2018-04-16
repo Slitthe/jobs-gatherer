@@ -1,6 +1,8 @@
 const data = require('./data'),
       helpers = require('./helpers'),
-      models = require('./models');
+      models = require('./models'),
+      request = require('request'),
+      parser = require('./parser');
 
 var routes = function(app, push) {
 
@@ -20,7 +22,42 @@ var routes = function(app, push) {
       let action = req.body.action || null;
       if(action === 'stop' || action === 'start') {
          if(action === 'start') {
-            data.run.start(helpers.starter, [data, models, helpers.infiniteRepeat, push]);
+            // data.run.start(helpers.starter, [data, models, helpers.infiniteRepeat, push, request, parser, helpers.dbAdd, helpers.repeat]);
+            data.run.start({
+               runner: helpers.starter,
+               args: {
+                  data: data,
+                  models: models,
+                  runFunc: helpers.infiniteRepeat,
+                  push: push,
+                  parse: parser,
+                  request: request,
+                  dbAdd: helpers.dbAdd,
+                  repeat: helpers.repeat
+               },
+               push: push
+            });
+          // var starter = function (data, models, runFunc, push, request, parse, dbAdd, repeat) {
+            //
+            // push, request, parser, helpers.dbAdd, helpers.repeat
+            /* 
+                start: function(argsObj) {
+                  // runner, args
+                  if(!this.isRunning) {
+                     this.continue = true;
+                     argsObj.runner.apply(this, argsObj.args);
+                     if (argsObj.hasOwnProperty('push')) {
+                        argsObj.push('stoppedStatus', 'false');
+                     }
+                  } else {
+                     console.log('The search is already running');
+                  }
+               },
+               get isRunning() {
+                  return !!(this.continue && this.runTimeout);
+               }
+            };
+            */
          } else {
             data.run.cancel(push);
          }
@@ -55,7 +92,15 @@ var routes = function(app, push) {
                // every piece of data was the correct format/length
                let returnObj = {};
                returnObj[type] = [value];
-               data.updateValues(returnObj, models, JSON.parse(add));
+               data.updateValues(
+                  {
+                     valueObj: returnObj,
+                     models: models,
+                     add: JSON.parse(add),
+                     run: data.run
+                  }
+               );
+               //// obj, models, add, run
                res.send('success');
             } else { // doesn't allow for the deletion of the last item in the category
                res.status(400);
@@ -106,7 +151,7 @@ var routes = function(app, push) {
 				if(!err) { // communication succesful with the DB
 					if(results) {
                   // category and city data splitter
-                  var splitData = helpers.dataSplitter(results);
+                  var splitData = helpers.dataSplitter(results, data.types);
                   // index template render
 						res.render('index', {results: splitData, site: site, data: data, btnGroups: helpers.btnGroups});
 					}

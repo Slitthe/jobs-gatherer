@@ -41,12 +41,13 @@ exportData.types = [
 
 
 
-exportData.getData = function(models, callback) {
+exportData.getData = function(argObj) {
+   // argObj
    var resData = {
-      keywords: exportData.keywords,
-      cities: exportData.cities
+      keywords: argObj.keywords,
+      cities: argObj.cities
    };
-   models.searchData.find({}, function(err, dbResults) {
+   argObj.models.searchData.find({}, function(err, dbResults) {
       
       if(!err && dbResults) {
          for(let i = 0; i < dbResults.length; i++) {
@@ -54,7 +55,7 @@ exportData.getData = function(models, callback) {
          }
          exportData.keywords = resData.keywords;
          exportData.cities = resData.cities;
-         callback(exportData);
+         argObj.callback(exportData);
         
          if(!dbResults.length) {
             
@@ -69,7 +70,7 @@ exportData.getData = function(models, callback) {
       else {
          exportData.keywords = resData.keywords;
          exportData.cities = resData.cities;
-         callback(exportData);
+         argObj.callback(exportData);
       }
    });
 };
@@ -92,12 +93,13 @@ exportData.run = {
          push('stoppedStatus', 'true');
       }
    },
-   start: function(runner, args) {
+   start: function(argsObj) {
+      // runner, args
       if(!this.isRunning) {
          this.continue = true;
-         runner.apply(this, args);
-         if (args[3]) {
-            args[3]('stoppedStatus', 'false');
+         argsObj.runner(argsObj.args);
+         if (argsObj.hasOwnProperty('push')) {
+            argsObj.push('stoppedStatus', 'false');
          }
       } else {
          console.log('The search is already running');
@@ -108,21 +110,23 @@ exportData.run = {
    }
 };
 
-exportData.updateValues = function (obj, models, add) {
-   if(!this.run.isRunning) { // only modify when the app isn't running
-      Object.keys(obj).forEach(function(type) { // loop trough the data sent in the POST request
-         if( (type === 'keywords' || type === 'cities') && Array.isArray(obj[type])) { // only take into consideration the two types
-            obj[type] = obj[type].filter(function(currentItem) { // data sanitizer
+exportData.updateValues = function (argObj) {
+   let valueObj = argObj.valueObj;
+   // obj, models, add, run
+   if(!argObj.run.isRunning) { // only modify when the app isn't running
+      Object.keys(valueObj).forEach(function(type) { // loop trough the data sent in the POST request
+         if ((type === 'keywords' || type === 'cities') && Array.isArray(valueObj[type])) { // only take into consideration the two types
+            valueObj[type] = valueObj[type].filter(function(currentItem) { // data sanitizer
                return typeof currentItem === 'string' && currentItem.length <= 60 && currentItem; 
             });
-            obj[type] = obj[type].map(function(item) { // string lowercaser (after only strings were kept)
+            valueObj[type] = valueObj[type].map(function(item) { // string lowercaser (after only strings were kept)
                return item.toLowerCase();
             });
             
-            models.searchData.findOne({type: type}, function(err, dbRes) { // access the DB data
+            argObj.models.searchData.findOne({type: type}, function(err, dbRes) { // access the DB data
                if (!err && dbRes) { // check for errors
-                  obj[type].forEach(function (item) { // loop through the items in the POST request
-                     if(add) { // add functionality
+                  valueObj[type].forEach(function (item) { // loop through the items in the POST request
+                     if(argObj.add) { // add functionality
                         if(dbRes.list.indexOf(item) === -1) { // check for duplicates
                            dbRes.list.push(item.toLowerCase());
                         }                        

@@ -2,7 +2,7 @@
 const data = require('./data'),
       mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost/jobs_gatherer');
+mongoose.connect('mongodb://localhost/jobs_gatherer_demo');
 
 
 var jobSchema = new mongoose.Schema({
