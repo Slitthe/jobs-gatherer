@@ -11,7 +11,7 @@ var routes = function(app, push) {
 
    // Settings
    app.get('/settings', function(req, res) {
-      res.render('settings', {data: data, runState: data.runData.isRunning});
+      res.render('settings', {data: data, runState: data.run.isRunning});
    });
 
    app.post('/runAction', function(req, res) {
@@ -20,9 +20,9 @@ var routes = function(app, push) {
       let action = req.body.action || null;
       if(action === 'stop' || action === 'start') {
          if(action === 'start') {
-            data.runData.start(helpers.starter, [data, models, helpers.infiniteRepeat, push]);
+            data.run.start(helpers.starter, [data, models, helpers.infiniteRepeat, push]);
          } else {
-            data.runData.cancel(push);
+            data.run.cancel(push);
          }
          res.send('');
       } else { // action is any other string other than 'stop' or 'start' or simply doesn't exist
@@ -44,7 +44,7 @@ var routes = function(app, push) {
          let value = req.body.value;
 
          // doesn't modify if the search service is running
-         if(!data.runData.isRunning) {
+         if(!data.run.isRunning) {
             let dataLength = data[type] ? data[type].length : 0; 
             let valueLength = value.length;
             if (valueLength > 60 || valueLength === 0) { // too long data or inexistent (0 length)
@@ -74,7 +74,7 @@ var routes = function(app, push) {
 
    // update the category of a rersult
    app.put('/:site/:id', function(req, res) { 
-      let 	types = ['deleted', 'default', 'saved'];
+      let 	types = data.types,
             site = req.params.site,
             type = req.body.type.toLowerCase(),
             id = req.params.id;
@@ -87,7 +87,7 @@ var routes = function(app, push) {
       }, function(err, data) { // handle errors and respond to the request so the Front End AJAX can handle changes
             if(!err) {
                console.log('Updated ' + Date.now()); // update the expiry date
-               res.send('Updated')
+               res.send('Updated');
             } else {
                res.status(401);
                res.send('');
@@ -115,8 +115,12 @@ var routes = function(app, push) {
 				}
 			});
 		} else { // wrong URL
-         res.send('<p style="text-align: center;">The site: <strong>' + site + '</strong> does not exist in the application\'s records');
+         res.sendFile(__dirname + '/public/static-html/404.html');
 		}
+   });
+
+   app.get('*', function(req, res) {
+      res.sendFile(__dirname + '/public/static-html/404.html');
    });
    
 

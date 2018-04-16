@@ -1,6 +1,6 @@
-const colors = require('colors');
 // what keywords to use
 var exportData = {};
+// default keywords list (in case no results in the DB)
 exportData.keywords = [
    'web developer',
    'front end',
@@ -20,7 +20,7 @@ exportData.keywords = [
    'programator',
    'it'
 ];
-// The cities to search in
+// Defualt cities list
 exportData.cities = [
    'brasov',
    'cluj-napoca'
@@ -32,11 +32,7 @@ exportData.sites = [
    'bestjobs'
 ];
 
-exportData.sitesColors = {
-   ejobs: 'rgba(63, 110, 227, 0.5)',
-   bestjobs: 'rgba(202, 143, 44, 0.5)',
-};
-
+// in what category types the results can be put in
 exportData.types = [
    'saved',
    'default',
@@ -81,7 +77,7 @@ exportData.getData = function(models, callback) {
 
 
 
-exportData.runData = {
+exportData.run = {
    continue: true,
    runTimeout: [],
    cancel:  function(push) {
@@ -113,7 +109,7 @@ exportData.runData = {
 };
 
 exportData.updateValues = function (obj, models, add) {
-   if(!this.runData.isRunning) { // only modify when the app isn't running
+   if(!this.run.isRunning) { // only modify when the app isn't running
       Object.keys(obj).forEach(function(type) { // loop trough the data sent in the POST request
          if( (type === 'keywords' || type === 'cities') && Array.isArray(obj[type])) { // only take into consideration the two types
             obj[type] = obj[type].filter(function(currentItem) { // data sanitizer
@@ -138,7 +134,6 @@ exportData.updateValues = function (obj, models, add) {
                      }
 
                   });
-                  console.log(colors.cyan('THIS IS THE DBRES LIST:-->>'), dbRes.list);
                   exportData[type] = dbRes.list; // synchronizes the values in the memory and the DB
                   dbRes.save(); // saves the DB entry
                }

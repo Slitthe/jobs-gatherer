@@ -45,30 +45,7 @@ var searchDataSchema = new mongoose.Schema({
 });
 
 var SearchData = mongoose.model('searchData', searchDataSchema);
-// SearchData.create({
-//    type: 'keywords',
-//    list: ['web developer',
-//       'front end',
-//       'front end developer',
-//       'css',
-//       'css3',
-//       'html',
-//       'html5',
-//       'bootstrap',
-//       'jquery',
-//       'javascript',
-//       'js',
-//       'software developer',
-//       'javascript developer',
-//       'developer',
-//       'programmer',
-//       'programator',
-//       'it',]
-// });
-// SearchData.create({
-//    type: 'cities',
-//    list: ['brasov', 'cluj-napoca']
-// });
+
 
 
 

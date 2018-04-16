@@ -1,3 +1,14 @@
+/* General / Helpers */
+body {
+   padding-left: 10px;
+   padding-right: 10px;
+}
+
+.row-margin {
+   margin-left: -15px;
+   margin-right: -15px;
+}
+
 .result-item {
    display: block;
    width: 100%;
@@ -8,73 +19,37 @@
    box-sizing: border-box;
 }
 
-.list-group-item {
-   padding: 0;
-}
-
-.list-group-item:hover {
-   background: rgba(82%, 82%, 82%, 0.7);
-}
-.list-group-item:active {
-   background: rgba(82%, 82%, 82%, 0.9);
-}
-
-.list-group-item:focus {
-   background: rgba(87%, 87%, 87%, 0.95);
-}
-
-.btn-group, .absolute-right {
+/* Positions something absolutely to the right with a bit of spacing */
+.absolute-right {
    right: 5px;
    top: 5px;
    bottom: 5px;
    z-index: 999;
 }
 
-   
-.result-type {
-   margin-bottom: 150px;
-}
+/* list-group-item extended styling */
+.list-group-item { padding: 0; }
+.list-group-item:hover { background: rgba(82%, 82%, 82%, 0.7); }
+.list-group-item:active { background: rgba(82%, 82%, 82%, 0.9); }
+.list-group-item:focus { background: rgba(87%, 87%, 87%, 0.95); }
 
-.list-active {
-   background: rgba(218, 232, 101, 0.32);
-}
 
-.led-green {
-   color: rgba(40, 200, 70, 0.7);
-}
-.led-red {
-   color: rgba(230, 70, 40, 0.7);
-}
-.led-green .led-body {
-   background-color: rgba(40, 200, 70, 0.7);
-}
-.led-red .led-body {
-   background-color: rgba(230, 70, 40, 0.7);
-}
+.result-type { margin-bottom: 150px; }
 
-.info:empty {
-   display: none;
-}
+[data-status] { transition: 0.7s all linear; }
 
 
 
+/* 'LED' running status */
+.led-green { color: rgba(40, 200, 70, 0.7); }
+.led-red { color: rgba(230, 70, 40, 0.7); }
+.led-green .led-body { background-color: rgba(40, 200, 70, 0.7); }
+.led-red .led-body { background-color: rgba(230, 70, 40, 0.7); }
+.led, .led-body { display: inline-block; }
 .led-body {
    margin-left: 1em;
 	width: 1em;
 	height: 1em;
 	border-radius: 50%;
 	box-shadow: inset 0 0 0.6em 0.2em rgba(80, 80, 80, 0.5), 0 0 0.5em 0 currentColor;
-}
-
-.led, .led-body {
-   display: inline-block;
-}
-
-[data-status] {
-   transition: 0.7s all linear;
-}
-
-.row-margin {
-   margin-left: -15px;
-   margin-right: -15px;
 }

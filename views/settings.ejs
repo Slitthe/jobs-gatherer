@@ -1,9 +1,15 @@
-<% include partials/header %>
+<% include partials/header-top %>
+<% title = 'Settings' %>
+<% include partials/header-bottom %>
 
-   <div class='container my-5'>
+   <nav class='container my-5'>
       <a class='btn btn-link' href='/'>‹‹ Go Home</a>
-      <div class='status'>
-         <h2 class='mb-0' >Live search status</h2>
+   </nav>
+   <main class='container my-5'>
+      
+      <!-- The live status update -->
+      <section class='status'>
+         <h1 class='mb-0 h2 row-margin' >Live search status</h1>
          <table class='table table-bordered my-5 row-margin'>
             <tr>
                <th class='bg-light'>Site</th>
@@ -20,32 +26,38 @@
                </tr>
             <% }); %>
          </table>
-      </div>
-      <div class='row'>
-         <ul class='list-group mb-5 col-md' id='keywords'>
-            <h2>Keywords</h2>
-            <% data.keywords.forEach(function(keyword) { %>
-               <li class='list-group-item px-1 position-relative py-2' data-item='<%= keyword %>'>
-                  <span class='item-text'><%=keyword%></span>
-                  <button class='remove-item btn btn-danger position-absolute absolute-right'>
-                     <i class='fa fa-trash'></i>
-                  </button>
-               </li>
-            <% }) %>
-         </ul>
-         <ul class='list-group mb-5 col-md' id='cities'>
-            <h2>Locations</h2>
-            <% data.cities.forEach(function(city) { %>
-               <li class='list-group-item px-1 position-relative py-2' data-item='<%= city %>'>
-                  <span class='item-text'><%=city%></span>
-                  <button class='remove-item btn btn-danger position-absolute absolute-right'>
-                     <i class='fa fa-trash'></i>
-                  </button>
-               </li>
-            <% }) %>
-         </ul>
-      </div>
+      </section>
 
+      <!-- The data which is used for the search -->
+      <section>
+         <h1 class='h2 row-margin'>Search Data</h1>
+         <div class='row'>
+            <ul class='list-group mb-5 col-md' id='keywords'>
+               <h2>Keywords</h2>
+               <% data.keywords.forEach(function(keyword) { %>
+                  <li class='list-group-item px-1 position-relative py-2' data-item='<%= keyword %>'>
+                     <span class='item-text'><%=keyword%></span>
+                     <button class='remove-item btn btn-danger position-absolute absolute-right'>
+                        <i class='fa fa-trash'></i>
+                     </button>
+                  </li>
+               <% }) %>
+            </ul>
+            <ul class='list-group mb-5 col-md' id='cities'>
+               <h2>Locations</h2>
+               <% data.cities.forEach(function(city) { %>
+                  <li class='list-group-item px-1 position-relative py-2' data-item='<%= city %>'>
+                     <span class='item-text'><%=city%></span>
+                     <button class='remove-item btn btn-danger position-absolute absolute-right'>
+                        <i class='fa fa-trash'></i>
+                     </button>
+                  </li>
+               <% }) %>
+            </ul>
+         </div>
+      </section>
+
+      <!-- error messaging -->
       <div class="alert alert-danger alert-dismissible show error-container d-none" role="alert">
          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
@@ -55,33 +67,35 @@
 
 
 
-
-      <div class='border p-2 row-margin'> 
+      <!-- Run state display & change -->
+      <section class='border p-2 row-margin'> 
          <% var runClass = runState ? 'led-green' : 'led-red';%>
          <p>
-         Running state:
+            <h1 class='d-inline h6'>Running state:</h1>
             <span class='led <%= runClass%> state-display'>
-            <span class='state-text'>
-               <% if(runState) {%> 
-                  Running
-               <% } else {%>
-                  Stopped
-               <% } %>
+               <span class='state-text'>
+                  <% if(runState) {%> 
+                     Running
+                  <% } else {%>
+                     Stopped
+                  <% } %>
+               </span>
+               <span class='led-body'></span>
             </span>
-            <span class='led-body'></span>
          </p>
-            <p class='text-muted'>The service must be stopped in order to modify the data</p>
-         </span>
-         <div class='btn-group start-stop'>
-            <button class='btn btn-danger stop'>STOP</button>
-            <button class='btn btn-success start'>START</button>  
+         
+         <p class='text-muted'>The service must be stopped in order to modify the data</p>
+         <div>
+            <div class='btn-group start-stop'>
+               <button class='btn btn-danger stop'>STOP</button>
+               <button class='btn btn-success start'>START</button>  
+            </div>
          </div>
-      </div>
+      </section>
 
-
-      <div class='my-5 py-3 px-2 border row-margin'>
-         <h2>Add value</h2>
-
+      <!-- Add value -->
+      <section class='my-5 py-3 px-2 border row-margin'>
+         <h1 class='h2'>Add value</h1>
          <form class='modify-form' method='POST' action='/update?_method=PUT&add=true' data-add='true'>
             <div class='form-group'>
                <label for='name'>Type</label> 
@@ -92,17 +106,14 @@
             </div>
             <div class='form-group'>
                <label for='value'>Type</label> 
-               <input class='form-control' type='text' id='value' name='value' placeholder='New value to add.'  required>
+               <input class='form-control' type='text' id='value' name='value' placeholder='New value to add.'  minlength='1' maxlength='60' pattern='(.*?){1,60}' required>
             </div> 
             <!--minlength='1' maxlength='60' -->
             <input class='btn btn-primary' type='submit'>
-
-
-
          </form>
-      </div>
+      </section>
 
-   </div>
+   </main>
 
    <script>
       var runState = {

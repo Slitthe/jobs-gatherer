@@ -1,24 +1,27 @@
-<% include partials/header %>
+<% include partials/header-top %>
+<% title = 'Results: ' + site %>
+<% include partials/header-bottom %>
 
-   <div class='container my-5'>
+   <nav class='container my-5'>
       <a class='btn btn-link' href='/'>‹‹ Go Home</a>
+   </nav>
+   <main class='container my-5'>
       <h1><%= site.toUpperCase() %></h1>
-
 
       <% data.types.forEach(function(type) { %> <% // saved, default and deleted %>
 
-         <div class='result-type' data-category='<%= type %>'> 
+         <section class='result-type' data-category='<%= type %>'> 
             <%= // type container %>
             <h3 class='text-center bg-info text-white row-margin py-2'> <%= type[0].toUpperCase() + type.substring(1)%></h3> 
 
                <% data.cities.forEach(function(city) { %>
                   <% var delClass = type === 'deleted' ? 'd-none deleted-result': '' %>
 
-                  <ul class='list-group mb-5' data-city='<%= city %>'>
+                  <ul class='list-group mb-5' data-city='<%= city %>' data-hidden='true'>
                      <li class='list-group-item row text-center py-2 text-white bg-dark' >
-                        <h4><%= city %> 
+                        <h1 class='h4'><%= city %> 
                            (<span class='counter'><%= results[type][city] ? results[type][city].length : 0 %></span>)
-                        </h4>
+                        </h1>
                      </li>
                         <li class='list-group-item row'>
                            <button class='toggle-hidden-next btn btn-block btn-secondary'>&#9660</button>
@@ -30,7 +33,7 @@
                               <%= result.title %>
                            </a>
 
-                           <div class="position-absolute btn-group func-btns" role="group" aria-label="Basic example" data-id='<%= result._id%>'>
+                           <div class="position-absolute btn-group absolute-right func-btns" role="group" aria-label="Basic example" data-id='<%= result._id%>'>
                               <%- btnGroups[type] %>
                            </div>
                         </li>
@@ -40,11 +43,12 @@
                <% }) %>
 
 
-         </div>
+         </section>
          
       <% }) %>
       
-   </div>
+   </main>
+   <script src='/js/index.js'></script>
 <% include partials/footer %>
 
 

@@ -1,18 +1,23 @@
-<% include partials/header %>
-<div class='container my-5'>
-   <section>
-      <h1 class='border-bottom'>Results</h1>
-      <% sites.forEach(function(site) { %>
-         <p>
-            <a class='btn btn-primary btn-block' href='<%= site %>'><%= site %></a>
-         </p>
-      <% }) %>
-   </section>
+<% include partials/header-top %>
+<% title = 'Jobs Lister' %>
+<% include partials/header-bottom %>
 
-   <hr>
-   <section>
-      <h1 class='border-bottom'>Settings</h1>
-      <a class='btn btn-secondary btn-block' href='/settings'>Change the settings</a>
-   </section>
-</div>
+<main>
+   <nav class='container my-5'>
+      <section>
+         <h1 class='border-bottom'>Results</h1>
+         <% sites.forEach(function(site) { %>
+            <p>
+               <a class='btn btn-primary btn-block' href='<%= site %>'><%= site %></a>
+            </p>
+         <% }) %>
+      </section>
+
+      <hr>
+      <section>
+         <h1 class='border-bottom'>Settings</h1>
+         <a class='btn btn-secondary btn-block' href='/settings'>Change the settings</a>
+      </section>
+   </nav>
+</main>
 <% include partials/footer %>

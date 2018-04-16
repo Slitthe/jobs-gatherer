@@ -10,6 +10,7 @@ es.addEventListener('update', function (evt) {
 function updateData(data) {
    var target = $('[data-site="' + data.site + '"]'); // find the site's container
    var targets = [ // the values for the live status for that site
+      // target and new updated value
       [target.find('[data-status="keyword"]'), data.query],
       [target.find('[data-status="location"]'), data.place],
       [target.find('[data-status="page"]'), data.page],
@@ -18,7 +19,7 @@ function updateData(data) {
    targets.forEach(function (target) {
       if (target[0].text() !== target[1]) { // only flash/update changed values
          target[0].text(target[1]); // change the actual Text value
-         target[0].css('background', 'rgba(173, 173, 255, 0.4)'); // change the background of changes content
+         target[0].css('background', 'rgba(173, 173, 255, 0.4)'); // change the background of changed content
          setTimeout(function () { // fade that after a period
             target[0].css('background', 'transparent');
          }, 2000);
@@ -71,6 +72,11 @@ Object.defineProperty(runState, 'isRunning', {
 
 // ======== DATA modifying add/remove =====================
 // add or remove data
+
+// succesful modify request
+
+// error modify request
+
 function modifyData(thisContext, type, value, add, evt) {
    evt.preventDefault();
    var parent = $(thisContext).parent();
@@ -108,7 +114,8 @@ function modifyData(thisContext, type, value, add, evt) {
             let errorText = {
                alredyRunning: 'The search service must be stopped before making any changes.',
                wrongRequest: 'There was a problem with the request being made.',
-               lastItem: 'You cannot delete the last item.'
+               lastItem: 'You cannot delete the last item.',
+               wrongLength: 'The value is either too short (at least 1) or too long (over 60).'
             };
             if (err.responseText) {
                $('.error-message').text(errorText[err.responseText]);
@@ -169,7 +176,7 @@ function runAction(action) {
          }
       });
    }
-};
+}
 
 // triggers the service stop/start action
 $('.stop').on('click', function () {

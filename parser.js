@@ -1,7 +1,7 @@
 // sites-specific HTML string parsers
 var parse = function () {
    var expressions = {
-      removeWs: /\n|\r/gim, // remove whitespace so the RegExp won't handle multi-line input
+      removeWs: /\n|\r/gim, // remove whitespace so the RegExp won't need multi-line input
       ejobs: {
          items: /dataLayerItemLink.*?<\/a>/gi, // find the job results
          href: /href="(.*?)"/gi, // find the link of that job result
@@ -12,7 +12,7 @@ var parse = function () {
          href: /href="(.*?)\?/gi,
          name: /<strong.*?>(.*?)<\/strong>/gi
       }
-   }
+   };
 
    var parseData = function (data) {
       var htmlString = data.str; // the response HTML (as a string)

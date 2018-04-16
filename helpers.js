@@ -1,6 +1,5 @@
 var models = require('./models');
 var data = require('./data');
-var getUrls = require('./urlConstructor');
 var parse = require('./parser');
 var request = require('request');
 var colors = require('colors');
@@ -52,7 +51,7 @@ var dbAdd = function (site, place, parsed) {
                      dbRes.updateDate = Date.now();
                      dbRes.save();
                   }
-               })
+               });
             }
          });
       }
@@ -71,11 +70,10 @@ return FORMAT:  >>
             }
 */
 var dataSplitter = function(items) {
-   var types = {
-      deleted: {},
-      saved: {},
-      default: {}
-   };
+   var types = {};
+   data.types.forEach(function(type) {
+      types[type] = {};
+   })
    var typesKeys = Object.keys(types);
 
    items.forEach(function(item) {
@@ -89,7 +87,6 @@ var dataSplitter = function(items) {
 
 // Removes every item in the DB (except the filterCat === 'saved' items) if they have passed an expiry date (7 days from update)
 var removeExpired = function(models, sites) {
-   
    sites.forEach(function(site) {
       models[site].find({}, function(err, results) { // find all the results for this given site
          if(!err) { // check for DB communication error
@@ -110,7 +107,7 @@ var removeExpired = function(models, sites) {
 var repeat = function (obj, data, toIncrement, func) {
    if (toIncrement) {
       if (obj.queries.index < obj.queries.values.length - 1) {
-         obj.queries.index++
+         obj.queries.index++;
       } else {
          if (obj.places.index < obj.places.values.length - 1) {
             obj.places.index++;
@@ -119,10 +116,10 @@ var repeat = function (obj, data, toIncrement, func) {
          }
          obj.queries.index = 0;
       }
-   };
+   }
    
 
-   data.runData.runTimeout.push( setTimeout(function () {
+   data.run.runTimeout.push( setTimeout(function () {
       func(obj, data);
    }, randomRange(10000, 10000)) ); //230000, 380000
 };
@@ -141,51 +138,32 @@ var saveValues = function(saveObj) {
    });
 };
 
-var buttonCreators = function (type, cls, iType) {
+var buttonCreators = function (type, cls, iType, title) {
    var buttonHtml = '<button type="button" class="px-3 btn btn-' + type + ' ' + cls;
-   buttonHtml += '"> <i class="fa fa-' + iType + '"></i></button>'
+   buttonHtml += '" title="' + title + '"> <i class="fa fa-' + iType + '"></i></button>';
 
    return buttonHtml;
 };
 
 var btnGroups = function (type) {
+   var titles = {
+      trash: 'Move this result to the trash area.',
+      save: 'Move this result to the saved area.',
+      restore: 'Remove this result from the deleted area'
+   };
    return {
       saved: (function () {
-         return buttonCreators('danger', 'delete-btn', 'trash');
+         return buttonCreators('danger', 'delete-btn', 'trash', titles.trash);
       })(),
       default: (function () {
-         return buttonCreators('success', 'save-btn', 'floppy-o') + buttonCreators('danger', 'delete-btn', 'trash');
+         return buttonCreators('success', 'save-btn', 'floppy-o', titles.save) + buttonCreators('danger', 'delete-btn', 'trash', titles.trash);
       })(),
       deleted: (function () {
-         return buttonCreators('success', 'save-btn', 'floppy-o') + buttonCreators('secondary', 'restore-btn', 'undo');
+         return buttonCreators('success', 'save-btn', 'floppy-o', titles.save) + buttonCreators('secondary', 'restore-btn', 'undo', titles.restore);
       })()
    };
 }();
 
-// var starter = function () {
-//    data.sites.forEach(function (site) {
-//       models.value.findOne({ site: site }, function (err, values) {
-//          if (!err && values) {
-//             actionFunc({
-//                site: site,
-//                queries: { values: data.keywords, index: values.keyword },
-//                places: { values: data.cities, index: values.city },
-//                page: values.page,
-//                tryCount: 1
-//             }, data);
-
-//          } else {
-//             actionFunc({
-//                site: site,
-//                queries: { values: data.keywords, index: 0 },
-//                places: { values: data.cities, index: 0 },
-//                page: 1,
-//                tryCount: 1
-//             }, data);
-//          }
-//       });
-//    });
-// };
 
 var starter = function (data, models, runFunc, push) {
    data.getData(models, function (dataRes) {
@@ -220,9 +198,37 @@ var starter = function (data, models, runFunc, push) {
    });
 };
 
+// Endpoint creator given the: query, city and page for a site
+var getUrls = function() {
+   // base urls
+   var urls = {
+      ejobs: 'https://www.ejobs.ro/locuri-de-munca/',
+      // Example: https://www.ejobs.ro/locuri-de-munca/brasov/web%20developer/page2/
+      bestjobs: 'https://www.bestjobs.eu/ro/locuri-de-munca/relevant/',
+      // Example: https://www.bestjobs.eu/ro/locuri-de-munca/relevant/3?keyword=web%20developer&location=brasov
+   };
+   var reqUrls = function (page, query, city, site) {
+      var url = '';
+
+      site = site.toLowerCase();
+      query = encodeURI(query); // make the keyword URL-friendly
+      var siteUrls = { // URL constructors for each site
+         ejobs: function () {
+            return urls.ejobs + city + '/' + query + '/page' + page + '/';
+         },
+         bestjobs: function () {
+            return urls.bestjobs + page + '?keyword=' + query + '&location=' + city;
+         }
+      };
+      return siteUrls[site](); // result of the constructor for the input 'site'
+   };
+
+   return reqUrls;
+}();
+
 function infiniteRepeat(obj, data, push) {
    
-   if (data.runData.continue) {
+   if (data.run.continue) {
       removeExpired(models, data.sites); // remove any expired DB entries
       saveValues(obj); // save indices & page to DB
       
@@ -270,7 +276,9 @@ function infiniteRepeat(obj, data, push) {
          }
       });
    }
-};
+}
+
+
 
 
 
@@ -284,5 +292,6 @@ module.exports = {
    saveValues: saveValues,
    btnGroups: btnGroups,
    starter: starter,
-   infiniteRepeat: infiniteRepeat
+   infiniteRepeat: infiniteRepeat,
+   getUrls: getUrls
 };
