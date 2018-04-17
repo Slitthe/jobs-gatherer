@@ -60,7 +60,7 @@ exportData.getData = function(argObj) {
          if(!dbResults.length) {
             
             Object.keys(resData).forEach(function(resDataKey) {
-               models.searchData.create({
+               argObj.models.searchData.create({
                   list: exportData[resDataKey],
                   type: resDataKey
                });

@@ -281,7 +281,7 @@ function infiniteRepeat(argObj) {
                argObj.dbAdd(
                   {
                      site: params.site,
-                     places: params.places.values[params.places.index],
+                     place: params.places.values[params.places.index],
                      parsed: parsed,
                      models: models
                   }
