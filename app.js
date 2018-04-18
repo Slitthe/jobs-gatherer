@@ -9,14 +9,15 @@ const express = require('express'),
       ssePusher = require('sse-pusher'),
       request = require('request');
    // Own modules files
-const helpers = require('./helpers'),
-      data = require('./data'),
-      models = require('./db/models'),
-      routes = require('./routes'),
+const helpers = require('./user_modules/helpers'),
+      data = require('./user_modules/data'),
+      models = require('./user_modules/db/models'),
+      routes = require('./user_modules/routes'),
       db =  {
-         methods: require('./db/methods')
+         methods: require('./user_modules/db/methods')
       },
-      search = require('./search');
+      search = require('./user_modules/search');
+
 const push = ssePusher();
 
 // EXPRESS
@@ -31,8 +32,9 @@ app.use( bodyParser.urlencoded({extended: true}) );
 routes(app, push); // routes
 
 // EXPRESS start
-app.listen(3000, function() {
-	console.log('EXPRESS started listening');
+var portNumber = 3000;
+app.listen(portNumber, function() {
+	console.log('EXPRESS started listening on PORT: ' + portNumber);
 });
 
 
@@ -51,5 +53,3 @@ search.starter({
    randomRange: helpers.randomRange,
    run: search.run
 });
-
-

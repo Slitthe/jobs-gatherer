@@ -38,49 +38,40 @@ exportData.types = [
    'deleted'
 ];
 
-
+const colors = require('colors');
 
 exportData.getData = function(argObj) {
    // argObj
-   var resData = {
-      keywords: exportData.keywords,
-      cities: exportData.cities
-   };
+   var types = ['keywords', 'cities'];
    argObj.models.searchData.find({}, function(err, dbResults) {
       if(!err && dbResults) {
          for(let i = 0; i < dbResults.length; i++) {
-            resData[dbResults[i].type] = dbResults[i].list;
+            exportData[dbResults[i].type] = dbResults[i].list;
          }
-         exportData.keywords = resData.keywords;
-         exportData.cities = resData.cities;
          argObj.callback(exportData);
          
          if(!dbResults.length) {
-            
-            Object.keys(resData).forEach(function(resDataKey) {
+            types.forEach(function(type) {
                argObj.models.searchData.create({
-                  list: exportData[resDataKey],
-                  type: resDataKey
+                  list: exportData[type],
+                  type: type
                });
             });
+
          }
       }
       else {
-         exportData.keywords = resData.keywords;
-         exportData.cities = resData.cities;
          argObj.callback(exportData);
       }
    }); 
+
 };
 
 
 
 
 
-module.exports = {
-   getData: exportData.getData,
-   cities: exportData.cities,
-   keywords: exportData.keywords,
-   sites: exportData.sites,
-   types: exportData.types
-};
+
+
+
+module.exports = exportData;

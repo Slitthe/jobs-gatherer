@@ -10,17 +10,17 @@ var getUrls = function () {
       bestjobs: 'https://www.bestjobs.eu/ro/locuri-de-munca/relevant/',
       // Example: https://www.bestjobs.eu/ro/locuri-de-munca/relevant/3?keyword=web%20developer&location=brasov
    };
-   var reqUrls = function (page, query, city, site) {
+   var reqUrls = function (page, query, location, site) {
       var url = '';
       
       site = site.toLowerCase();
       query = encodeURI(query); // make the keyword URL-friendly
       var siteUrls = { // URL constructors for each site
          ejobs: function () {
-            return urls.ejobs + city + '/' + query + '/page' + page + '/';
+            return urls.ejobs + location + '/' + query + '/page' + page + '/';
          },
          bestjobs: function () {
-            return urls.bestjobs + page + '?keyword=' + query + '&location=' + city;
+            return urls.bestjobs + page + '?keyword=' + query + '&location=' + location;
          }
       };
       return siteUrls[site](); // result of the constructor for the input 'site'
@@ -81,10 +81,8 @@ var starter = function (argObj) {
    argObj.data.getData(
       {
          models: argObj.models,
-         keywords: argObj.data.keywords,
-         cities: argObj.data.cities,
          callback: function (dataRes) {
-            argObj.data.sites.forEach(function (site) {
+            dataRes.sites.forEach(function (site) {
                argObj.models.value.findOne({ site: site }, function (err, values) {
                   let searchParams = { // create a default values for the search parameters
                      site: site,
@@ -113,7 +111,7 @@ var starter = function (argObj) {
                   // argObj.runFunc(searchParams, argObj.data, argObj.models, argObj.request, argObj.parse, argObj.dbAdd, argObj.repeat);
                   argObj.runFunc({
                      searchParams: searchParams,
-                     data: argObj.data,
+                     data: dataRes,
                      models: argObj.models,
                      request: argObj.request,
                      parse: argObj.parse,
@@ -137,7 +135,6 @@ var starter = function (argObj) {
 
 // incrementor and repeater for the search
 var repeat = function (argObj, func, increment) {
-   // console.log(args);
    let params = argObj.searchParams;
    if (increment) {
       if (params.queries.index < params.queries.values.length - 1) {
@@ -162,7 +159,7 @@ var repeat = function (argObj, func, increment) {
 function infiniteRepeat(argObj) {
    let params = argObj.searchParams;
    if (argObj.run.continue) {
-      argObj.removeExpired(argObj.models, data.sites); // remove any expired DB entries
+      argObj.removeExpired(argObj.models, argObj.data.sites); // remove any expired DB entries
       argObj.saveValues(params, argObj.models); // save indices & page to DB
 
       var url = getUrls(params.page, params.queries.values[params.queries.index], params.places.values[params.places.index], params.site); // req URL
@@ -173,9 +170,9 @@ function infiniteRepeat(argObj) {
 
          if (!err && response.statusCode === 200) { // successful request
             params.tryCount = 1;
-            let parsed = argObj.parse({
-               str: body,
-               site: params.site
+            let   parsed = argObj.parse({
+                  str: body,
+                  site: params.site
             }); // parsed HTML request to extract the jobs listing (if any)
             if (parsed) { // 1 or more results (otherwise parsed is null)
                argObj.dbAdd(
@@ -244,7 +241,6 @@ var run = {
             argsObj.push('stoppedStatus', 'false');
          }
       } else {
-         console.log('The search is already running');
       }
    },
    get isRunning() {

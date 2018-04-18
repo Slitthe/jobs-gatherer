@@ -1,3 +1,4 @@
+var dataModule = require('../data');
 // add results to the DB
 var dbAdd = function (argObj) {
    // site, place, parsed, models

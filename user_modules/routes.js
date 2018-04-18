@@ -1,11 +1,12 @@
-const data = require('./data'),
+
+const search = require('./search'),
       helpers = require('./helpers'),
       models = require('./db/models'),
       request = require('request'),
       db = {
          methods: require('./db/methods')
       },
-      search = require('./search');
+      data = require('./data');
       
 
 
@@ -18,13 +19,10 @@ var routes = function(app, push) {
 
    // Settings
    app.get('/settings', function(req, res) {
-      console.log(data);
       res.render('settings', {data: data, runState: search.run.isRunning});
    });
 
    app.post('/runAction', function(req, res) {
-      console.log(req.body);
-
       let action = req.body.action || null;
       if(action === 'stop' || action === 'start') {
          if(action === 'start') {
@@ -151,17 +149,19 @@ var routes = function(app, push) {
 				}
 			});
 		} else { // wrong URL
-         res.sendFile(__dirname + '/public/static-html/404.html');
+         res.render('404');
 		}
    });
 
    app.get('*', function(req, res) {
-      res.sendFile(__dirname + '/public/static-html/404.html');
+      res.render('404');
    });
    
 
    // Category modifier (saved, default or deleted)
 
 };
+
+
 
 module.exports = routes;
