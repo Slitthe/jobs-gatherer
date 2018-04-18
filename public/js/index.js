@@ -1,12 +1,12 @@
 // return the buttons for different types of results (when changing their category)
-var buttonCreators = function (type, cls, iType, title) {
-   var buttonHtml = '<button type="button" class="px-3 btn btn-' + type + ' ' + cls;
-   buttonHtml += '" title="' + title + '"> <i class="fa fa-' + iType + '"></i></button>';
-
-   return buttonHtml;
-};
 
 var btnGroups = function (type) {
+   var buttonCreators = function (type, cls, iType, title) {
+      var buttonHtml = '<button type="button" class="px-3 btn btn-' + type + ' ' + cls;
+      buttonHtml += '" title="' + title + '"> <i class="fa fa-' + iType + '"></i></button>';
+   
+      return buttonHtml;
+   };
    var titles = {
       trash: 'Move this result to the trash area.',
       save: 'Move this result to the saved area.',

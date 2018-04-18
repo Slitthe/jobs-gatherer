@@ -1,8 +1,13 @@
 const data = require('./data'),
       helpers = require('./helpers'),
-      models = require('./models'),
+      models = require('./db/models'),
       request = require('request'),
-      parser = require('./parser');
+      db = {
+         methods: require('./db/methods')
+      },
+      search = require('./search');
+      
+
 
 var routes = function(app, push) {
 
@@ -13,7 +18,8 @@ var routes = function(app, push) {
 
    // Settings
    app.get('/settings', function(req, res) {
-      res.render('settings', {data: data, runState: data.run.isRunning});
+      console.log(data);
+      res.render('settings', {data: data, runState: search.run.isRunning});
    });
 
    app.post('/runAction', function(req, res) {
@@ -22,44 +28,28 @@ var routes = function(app, push) {
       let action = req.body.action || null;
       if(action === 'stop' || action === 'start') {
          if(action === 'start') {
-            // data.run.start(helpers.starter, [data, models, helpers.infiniteRepeat, push, request, parser, helpers.dbAdd, helpers.repeat]);
-            data.run.start({
-               runner: helpers.starter,
+            search.run.start({
+               runner: search.starter,
                args: {
                   data: data,
                   models: models,
-                  runFunc: helpers.infiniteRepeat,
+                  runFunc: search.infiniteRepeat,
                   push: push,
-                  parse: parser,
+                  parse: search.parse,
                   request: request,
-                  dbAdd: helpers.dbAdd,
-                  repeat: helpers.repeat
+                  dbAdd: db.methods.dbAdd,
+                  repeat: search.repeat,
+                  duplicateChecker: helpers.duplicateChecker,
+                  removeExpired: db.methods.removeExpired,
+                  saveValues: db.methods.saveValues,
+                  randomRange: helpers.randomRange,
+                  run: search.run
                },
                push: push
             });
-          // var starter = function (data, models, runFunc, push, request, parse, dbAdd, repeat) {
-            //
-            // push, request, parser, helpers.dbAdd, helpers.repeat
-            /* 
-                start: function(argsObj) {
-                  // runner, args
-                  if(!this.isRunning) {
-                     this.continue = true;
-                     argsObj.runner.apply(this, argsObj.args);
-                     if (argsObj.hasOwnProperty('push')) {
-                        argsObj.push('stoppedStatus', 'false');
-                     }
-                  } else {
-                     console.log('The search is already running');
-                  }
-               },
-               get isRunning() {
-                  return !!(this.continue && this.runTimeout);
-               }
-            };
-            */
+
          } else {
-            data.run.cancel(push);
+            search.run.cancel(push);
          }
          res.send('');
       } else { // action is any other string other than 'stop' or 'start' or simply doesn't exist
@@ -81,7 +71,7 @@ var routes = function(app, push) {
          let value = req.body.value;
 
          // doesn't modify if the search service is running
-         if(!data.run.isRunning) {
+         if(!search.run.isRunning) {
             let dataLength = data[type] ? data[type].length : 0; 
             let valueLength = value.length;
             if (valueLength > 60 || valueLength === 0) { // too long data or inexistent (0 length)
@@ -92,12 +82,13 @@ var routes = function(app, push) {
                // every piece of data was the correct format/length
                let returnObj = {};
                returnObj[type] = [value];
-               data.updateValues(
+               db.methods.updateValues(
                   {
                      valueObj: returnObj,
                      models: models,
                      add: JSON.parse(add),
-                     run: data.run
+                     run: search.run,
+                     data: data,
                   }
                );
                //// obj, models, add, run
