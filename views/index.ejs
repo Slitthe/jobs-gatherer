@@ -10,30 +10,30 @@
 
       <% data.types.forEach(function(type) { %> <% // saved, default and deleted %>
 
-         <section class='result-type' data-category='<%= type %>'> 
-            <%= // type container %>
+         <!-- Type container -->
+         <section class='result-type' data-category='<%= type %>'>
             <h3 class='text-center bg-info text-white row-margin py-2'> <%= type[0].toUpperCase() + type.substring(1)%></h3> 
 
-               <% data.cities.forEach(function(city) { %>
+               <% data.locations.forEach(function(location) { %>
                   <% var delClass = type === 'deleted' ? 'd-none deleted-result': '' %>
 
-                  <ul class='list-group mb-5' data-city='<%= city %>' data-hidden='true'>
+                  <ul class='list-group mb-5' data-location='<%= location %>' data-hidden='true'>
                      <li class='list-group-item row text-center py-2 text-white bg-dark' >
-                        <h1 class='h4'><%= city %> 
-                           (<span class='counter'><%= results[type][city] ? results[type][city].length : 0 %></span>)
+                        <h1 class='h4'><%= location %> 
+                           (<span class='counter'><%= results[type][location] ? results[type][location].length : 0 %></span>)
                         </h1>
                      </li>
                         <li class='list-group-item row'>
                            <button class='toggle-hidden-next btn btn-block btn-secondary'>&#9660</button>
                         </li>
-                     <% if(results[type][city]) { %>
-                        <% results[type][city].forEach(function(result) { %>
+                     <% if(results[type][location]) { %>
+                        <% results[type][location].forEach(function(result) { %>
                         <li class='list-group-item row position-relative d-none result' tabindex='-1'>
                            <a class='col-xs-8 result-item' href='<%= result.url %>' target='_blank'>
                               <%= result.title %>
                            </a>
 
-                           <div class="position-absolute btn-group absolute-right func-btns" role="group" aria-label="Basic example" data-id='<%= result._id%>'>
+                           <div class="position-absolute btn-group absolute-right func-btns" role="group" data-id='<%= result._id%>'>
                               <%- btnGroups[type] %>
                            </div>
                         </li>

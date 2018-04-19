@@ -7,7 +7,6 @@
  
 
 ## Requirements
-
   
 
 - [ ] **NodeJS / NPM**
@@ -32,29 +31,31 @@
 
 ## Description:
 
-Node-JS local application which gathers jobs listings based on on a list of **keywords** and **locations**. It searches in some predefined sites, which can be manually expanded (only romanian **ejobs** and **bestjobs** work so far) by defining them ine the code.
+Node-JS local application which gathers jobs listings based on on a list of **queries** and **locations**. It searches in some predefined sites, which can be manually expanded (only romanian **ejobs** and **bestjobs** work so far) by defining them in the code.
 
   
 
 ## How it works:
 
-The application makes an HTTP request to those websites using the: **query**, **location** and **page** arguments, receives an HTML text (string) as a response, which is parsed into a list(array) of {name: String, url:String} type of results by using Regular Expressions.
+The application makes an HTTP request to those websites using the: **query**, **location** and **page** arguments, receives an HTML text (string) as a response, which is parsed into a list(array) of `{name: String, url:String}` type of results by using Regular Expressions.
 
   
 
-Starts with **page** 1 for each query/location combination, continues to increment the page until no results are found, in that moment it actually goes to the next query/location combination.
+Starts with **page** 1 for each **query/location** combination, continues to increment the page until no results are found, in that moment it actually goes to the next **query/location** combination.
 
   
 
-On the occasion of failed requests, it tried again for a number of 3 times, if all of them fail, it just skips the current query/location and tries the next one.
+On the occasion of failed requests, it tried again for a number of 3 times, if all of them fail, it just skips the current **query/location** and tries the next one.
 
   
 
-The search continues indefinitely, by going in a front-back in the query/location combination, the repetition delayed to avoid excessive HTTP requests to the destination.
+The search continues indefinitely, by going in a front-back in the **query/location** combination; the repetition is delayed to avoid excessive HTTP requests to the destination.
+
+Site searches run in parallel.
 
   
 <br><br><br><br><br><br><br><br><br>
-### Adding additional sites:
+## Adding additional sites:
 
 It is possible to add additional sites by manually defining them like so:
 
@@ -80,7 +81,7 @@ It is possible to add additional sites by manually defining them like so:
 
   
 
-### Node modules used:
+## Node modules used:
 
 -- [Express](https://www.npmjs.com/package/express)
 
@@ -96,9 +97,8 @@ It is possible to add additional sites by manually defining them like so:
 
 -- [body-parser](https://www.npmjs.com/package/body-parser)
 
-  
-
-### Front-end interaction
+<br><br><br><br><br>
+## Front-end interaction
 
 Displaying the basic settings, as well as the results can be made via the front-end interface interaction provided, using.
 
@@ -116,7 +116,7 @@ Results are categorized by sites, and then subcategorized by their location and 
 
   
 
-The app uses **MongoDB** to save the results of the searches, as well as the list of **keywords/locations** and the current current or last known position of the search (so it can resume from that place).
+The app uses **MongoDB** to save the results of the searches, as well as the list of **query/locations** and the current current or last known position of the search (so it can resume from that place).
 
   
 

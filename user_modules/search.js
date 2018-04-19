@@ -1,7 +1,7 @@
-const colors = require('colors');
-// Endpoint creator given the: query, city and page for a site
+const colors = require('colors'); // package to easily use terminal colors for console.log(s)
 
 
+// Endpoint creator given the: QUERY, LOCATION and PAGE for a site
 var getUrls = function () {
    // base urls
    var urls = {
@@ -14,7 +14,7 @@ var getUrls = function () {
       var url = '';
       
       site = site.toLowerCase();
-      query = encodeURI(query); // make the keyword URL-friendly
+      query = encodeURI(query); // make the query URL-friendly
       var siteUrls = { // URL constructors for each site
          ejobs: function () {
             return urls.ejobs + location + '/' + query + '/page' + page + '/';
@@ -29,7 +29,7 @@ var getUrls = function () {
    return reqUrls;
 }();
 
-// sites-specific HTML string parsers
+// sites-specific HTML string response parsers
 var parse = function () {
    var expressions = {
       removeWs: /\n|\r/gim, // remove whitespace so the RegExp won't need multi-line input
@@ -80,48 +80,46 @@ var parse = function () {
 var starter = function (argObj) {
    argObj.data.getData(
       {
-         models: argObj.models,
+         models: argObj.db.models,
          callback: function (dataRes) {
             dataRes.sites.forEach(function (site) {
-               argObj.models.value.findOne({ site: site }, function (err, values) {
+               argObj.db.models.value.findOne({ site: site }, function (err, values) {
                   let searchParams = { // create a default values for the search parameters
                      site: site,
                      tryCount: 1,
                      queries: {
-                        values: dataRes.keywords,
+                        values: dataRes.queries,
                         index: 0
                      },
-                     places: {
-                        values: dataRes.cities,
+                     locations: {
+                        values: dataRes.locations,
                         index: 0
                      },
                      page: 1,
                      push: argObj.push
                   };
                   if (!err && values) {
-                     let cityIndex = dataRes.cities.indexOf(values.city);
-                     cityIndex = cityIndex !== -1 ? cityIndex : 0;
-                     let keywordIndex = dataRes.keywords.indexOf(values.keyword);
-                     keywordIndex = keywordIndex !== -1 ? keywordIndex : 0;
+                     let   locationIndex = dataRes.locations.indexOf(values.location);
+                           searchParams.locations.index = locationIndex !== -1 ? locationIndex : 0;
 
-                     searchParams.queries.index = keywordIndex;
-                     searchParams.places.index = cityIndex;
-                     searchParams.page = values.page;
+                     let   queryIndex = dataRes.queries.indexOf(values.query);
+                           searchParams.queries.index = queryIndex !== -1 ? queryIndex : 0;
+
+                     searchParams.page = queryIndex !== -1 ? values.page : 1;
                   }
-                  // argObj.runFunc(searchParams, argObj.data, argObj.models, argObj.request, argObj.parse, argObj.dbAdd, argObj.repeat);
-                  argObj.runFunc({
+                  argObj.search.infiniteRepeat({
                      searchParams: searchParams,
                      data: dataRes,
-                     models: argObj.models,
+                     models: argObj.db.models,
                      request: argObj.request,
-                     parse: argObj.parse,
-                     dbAdd: argObj.dbAdd,
-                     repeat: argObj.repeat,
-                     duplicateChecker: argObj.duplicateChecker,
-                     removeExpired: argObj.removeExpired,
-                     saveValues: argObj.saveValues,
-                     randomRange: argObj.randomRange,
-                     run: argObj.run
+                     parse: argObj.search.parse,
+                     dbAdd: argObj.db.methods.dbAdd,
+                     repeat: argObj.search.repeat,
+                     duplicateChecker: argObj.helpers.duplicateChecker,
+                     removeExpired: argObj.db.methods.removeExpired,
+                     saveValues: argObj.db.methods.saveValues,
+                     randomRange: argObj.helpers.randomRange,
+                     run: argObj.search.run
                   });
 
                }); // models values find
@@ -140,10 +138,10 @@ var repeat = function (argObj, func, increment) {
       if (params.queries.index < params.queries.values.length - 1) {
          params.queries.index++;
       } else {
-         if (params.places.index < params.places.values.length - 1) {
-            params.places.index++;
+         if (params.locations.index < params.locations.values.length - 1) {
+            params.locations.index++;
          } else {
-            params.places.index = 0;
+            params.locations.index = 0;
          }
          params.queries.index = 0;
       }
@@ -162,9 +160,9 @@ function infiniteRepeat(argObj) {
       argObj.removeExpired(argObj.models, argObj.data.sites); // remove any expired DB entries
       argObj.saveValues(params, argObj.models); // save indices & page to DB
 
-      var url = getUrls(params.page, params.queries.values[params.queries.index], params.places.values[params.places.index], params.site); // req URL
+      var url = getUrls(params.page, params.queries.values[params.queries.index], params.locations.values[params.locations.index], params.site); // req URL
 
-      console.log(colors.cyan.bold('KEYWORD: ') + colors.underline(params.queries.values[params.queries.index]) + colors.cyan.bold('   LOCATION: ') + colors.underline(params.places.values[params.places.index]) + colors.cyan.bold('   PAGE:') + colors.underline(params.page));
+      console.log(colors.cyan.bold('QUERY: ') + colors.underline(params.queries.values[params.queries.index]) + colors.cyan.bold('   LOCATION: ') + colors.underline(params.locations.values[params.locations.index]) + colors.cyan.bold('   PAGE:') + colors.underline(params.page));
 
       argObj.request(url, function (err, response, body) {
 
@@ -175,29 +173,29 @@ function infiniteRepeat(argObj) {
                   site: params.site
             }); // parsed HTML request to extract the jobs listing (if any)
             if (parsed) { // 1 or more results (otherwise parsed is null)
+
                argObj.dbAdd(
                   {
                      site: params.site,
-                     place: params.places.values[params.places.index],
+                     location: params.locations.values[params.locations.index],
                      parsed: parsed,
                      models: argObj.models,
                      duplicateChecker: argObj.duplicateChecker
                   }
                );
 
-
                params.page++; // increment the page
-               argObj.repeat(argObj, infiniteRepeat, false); // but DO NOT increment queries/places
+               argObj.repeat(argObj, infiniteRepeat, false); // but DO NOT increment queries/locations
             } else {
                // no results found
 
                params.page = 1; // reset the page
 
-               argObj.repeat(argObj, infiniteRepeat, true); // increment the queries/places when there are no results for the current page
+               argObj.repeat(argObj, infiniteRepeat, true); // increment the queries/locations when there are no results for the current page
             }
             params.push('update', {
                query: params.queries.values[params.queries.index],
-               place: params.places.values[params.places.index],
+               location: params.locations.values[params.locations.index],
                page: params.page,
                site: params.site
             });
@@ -208,7 +206,7 @@ function infiniteRepeat(argObj) {
             if (params.tryCount < 3) { // try again for a maximum of 'n' times (curent: 3)
                params.tryCount++;
                argObj.repeat(argObj, infiniteRepeat, false);
-            } else { // skip for the next item in the location/keywords when too many attempted tries failed
+            } else { // skip for the next item in the queries/locations when too many attempted tries failed
                params.tryCount = 1;
                argObj.repeat(argObj, infiniteRepeat, true);
             }

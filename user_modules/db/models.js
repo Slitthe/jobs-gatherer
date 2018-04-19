@@ -8,7 +8,7 @@ var models = function() {
       job: new mongoose.Schema({
          url: String,
          title: String,
-         city: String,
+         location: String,
          filterCat: {
             type: String,
             default: 'default'
@@ -20,13 +20,13 @@ var models = function() {
          }
       }),
       value: new mongoose.Schema({
-         city: {
+         location: {
             type: String,
-            default: data.keywords[0]
+            default: data.locations[0]
          },
-         keyword: {
+         query: {
             type: String,
-            default: data.cities[0]
+            default: data.queries[0]
          },
          page: {
             type: Number,

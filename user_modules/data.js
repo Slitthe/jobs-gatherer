@@ -1,6 +1,6 @@
-// default keywords list (in case no results in the DB)
 var exportData = {};
-exportData.keywords = [
+// default queries list (in case no results in the DB)
+exportData.queries = [
    'web developer',
    'front end',
    'front end developer',
@@ -19,8 +19,8 @@ exportData.keywords = [
    'programator',
    'it'
 ];
-// Defualt cities list
-exportData.cities = [
+// Defualt locations list
+exportData.locations = [
    'brasov',
    'cluj-napoca'
 ];
@@ -42,7 +42,7 @@ const colors = require('colors');
 
 exportData.getData = function(argObj) {
    // argObj
-   var types = ['keywords', 'cities'];
+   var types = ['queries', 'locations'];
    argObj.models.searchData.find({}, function(err, dbResults) {
       if(!err && dbResults) {
          for(let i = 0; i < dbResults.length; i++) {

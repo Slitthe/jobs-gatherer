@@ -1,6 +1,7 @@
 // =========== Server Sent events =================
-var es = new EventSource(window.location.origin + '/ssedemo');
+var es = new EventSource(window.location.origin + '/settings_sse');
 
+// listen for 'update' SSE events
 es.addEventListener('update', function (evt) {
    var data = evt.data ? JSON.parse(evt.data) : null;
    updateData(data);
@@ -11,23 +12,23 @@ function updateData(data) {
    var target = $('[data-site="' + data.site + '"]'); // find the site's container
    var targets = [ // the values for the live status for that site
       // target and new updated value
-      [target.find('[data-status="keyword"]'), data.query],
-      [target.find('[data-status="location"]'), data.place],
+      [target.find('[data-status="query"]'), data.query],
+      [target.find('[data-status="location"]'), data.location],
       [target.find('[data-status="page"]'), data.page],
    ];
 
    targets.forEach(function (target) {
       if (target[0].text() !== target[1]) { // only flash/update changed values
          target[0].text(target[1]); // change the actual Text value
-         target[0].css('background', 'rgba(173, 173, 255, 0.4)'); // change the background of changed content
+         target[0].addClass('current-search-item'); // change the background of changed content
          setTimeout(function () { // fade that after a period
-            target[0].css('background', 'transparent');
+            target[0].removeClass('current-search-item');
          }, 2000);
       }
    });
 }
 
-// running state status update upong recieving a Server Sent Event 'stoppedStatus'
+// running state status update upong recieving a Server Sent Event type of 'stoppedStatus'
 es.addEventListener('stoppedStatus', function (evt) {
    if (evt.data === 'true') {
       $('.state-display .state-text').text('Stopped');
@@ -71,11 +72,6 @@ Object.defineProperty(runState, 'isRunning', {
 
 
 // ======== DATA modifying add/remove =====================
-// add or remove data
-
-// succesful modify request
-
-// error modify request
 
 function modifyData(thisContext, type, value, add, evt) {
    evt.preventDefault();
@@ -84,6 +80,7 @@ function modifyData(thisContext, type, value, add, evt) {
       type: type,
       value: value
    };
+   console.log(sentData);
    let condition = add ? true : !add && window.confirm('Are you sure you want to delete ' + value + 'from the list?') ? true : false;
    if (condition) {
       $.ajax({
@@ -127,28 +124,16 @@ function modifyData(thisContext, type, value, add, evt) {
 
 // add
 $('.modify-form').submit(function (evt) {
-   var type = $(this).find('#name').val();
+   var type = $(this).find('#type').val();
    var value = $(this).find('#value').val();
-   modifyData(
-      this,
-      type,
-      value,
-      true,
-      evt
-   );
+   modifyData(this, type, value, true, evt);
 });
 // remove
 $('ul').on('click', '.remove-item', function (evt) {
    var parent = $(this).parent();
    var type = parent.parents('ul').attr('id');
    var value = parent.attr('data-item');
-   modifyData(
-      this,
-      type,
-      value,
-      false,
-      evt
-   );
+   modifyData(this, type, value, false, evt);
 });
 // ======== End of -- >DATA modifying add/remove ===========
 

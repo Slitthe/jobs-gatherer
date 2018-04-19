@@ -10,7 +10,7 @@ var randomRange = function (start, finish) {
    return Math.round(Math.random() * difference) + start;
 };
 
-// checks an array of objects for the existance of a property
+// checks an array of objects for the existance of a property value from a single source object
 var duplicateChecker = function(source, targets, property) {
    /* 
       Input: source--> the source object
@@ -36,15 +36,13 @@ var duplicateChecker = function(source, targets, property) {
 
 
 
-// Splits the data by category and city, used for front end display of items in the right container
+// Splits the data by category and location, used for front end display of items in the right container
 /* 
 return FORMAT:  >>
             type: {
-               filterType: {
-                  city: [item1, item2 ....],
-                  ...
-               }....
-            }
+                  location: [item1, item2 ....],..
+               }
+            },..
 */
 var dataSplitter = function(items, dataTypes) {
    var types = {};
@@ -54,20 +52,22 @@ var dataSplitter = function(items, dataTypes) {
    var typesKeys = Object.keys(types);
 
    items.forEach(function(item) {
+      // creates empty arrays for type/location unless that specific input is already an array
       types[item.filterCat] = types[item.filterCat] || [];
-      types[item.filterCat][item.city] = types[item.filterCat][item.city] || [];
-      types[item.filterCat][item.city].push(item);
+      types[item.filterCat][item.location] = types[item.filterCat][item.location] || [];
+      // for given type/location, pushes that item who matches it
+      types[item.filterCat][item.location].push(item);
    });
    return types;
 };
 
 
 
-// appropiated buttons depending on the item's category ('saved', 'default', 'deleted')
+// creates appropiate buttons depending on the item's category ('saved', 'default', 'deleted')
 var btnGroups = function (type) {
    var buttonCreators = function (type, cls, iType, title) {
-      var buttonHtml = '<button type="button" class="px-3 btn btn-' + type + ' ' + cls;
-      buttonHtml += '" title="' + title + '"> <i class="fa fa-' + iType + '"></i></button>';
+      var   buttonHtml = '<button type="button" class="px-3 btn btn-' + type + ' ' + cls;
+            buttonHtml += '" title="' + title + '"> <i class="fa fa-' + iType + '"></i></button>';
    
       return buttonHtml;
    };
@@ -77,6 +77,7 @@ var btnGroups = function (type) {
       save: 'Move this result to the saved area.',
       restore: 'Remove this result from the deleted area'
    };
+
    return {
       saved: (function () {
          return buttonCreators('danger', 'delete-btn', 'trash', titles.trash);
@@ -89,8 +90,6 @@ var btnGroups = function (type) {
       })()
    };
 }();
-
-
 
 
 module.exports = {

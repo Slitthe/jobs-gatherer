@@ -39,7 +39,7 @@ var updateCounters = function() {
 function moveCategory(thisContext, targetType) {
    let   id = $(thisContext).parent().attr('data-id'),
          parent = $(thisContext).parents('.list-group-item'),
-         city = parent.parents('.list-group').attr('data-city'),
+         location = parent.parents('.list-group').attr('data-location'),
          category = parent.parents('.result-type').attr('data-category');
    $.ajax({
       url: window.location.href + '/' + id + '?_method=PUT',
@@ -47,7 +47,7 @@ function moveCategory(thisContext, targetType) {
       method: 'POST',
       success: function () {
          parent.find('.btn-group').html(btnGroups[targetType]);
-         let target = $('[data-category="' + targetType + '"]' + ' [data-city="' + city + '"]');
+         let target = $('[data-category="' + targetType + '"]' + ' [data-location="' + location + '"]');
          if (target.attr('data-hidden') === 'true') {
             parent.addClass('d-none');
          }

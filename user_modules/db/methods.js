@@ -1,9 +1,8 @@
 var dataModule = require('../data');
 // add results to the DB
 var dbAdd = function (argObj) {
-   // site, place, parsed, models
-   var query = argObj.models[argObj.site].find({}).exec();
-   query.then(function (dbRes) {
+   var dbQuery = argObj.models[argObj.site].find({}).exec();
+   dbQuery.then(function (dbRes) {
       // Gets dbRes about the listings in the DB to compare duplication
       if (dbRes) {
          argObj.parsed.forEach(function (current) {
@@ -11,7 +10,7 @@ var dbAdd = function (argObj) {
                argObj.models[argObj.site].create({
                   url: current.url,
                   title: current.title,
-                  city: argObj.place
+                  location: argObj.location
                });
             } else { // no duplicates --> update existing entry & save
                argObj.models[argObj.site].findOne({ url: current.url }, function (err, dbRes) {
@@ -48,8 +47,8 @@ var removeExpired = function (models, sites) {
 var saveValues = function (saveObj, models) {
    models.value.findOne({ site: saveObj.site }, function (err, data) {
       if (!err && data) {
-         data.keyword = saveObj.queries.values[saveObj.queries.index];
-         data.city = saveObj.places.values[saveObj.places.index];
+         data.query = saveObj.queries.values[saveObj.queries.index];
+         data.location = saveObj.locations.values[saveObj.locations.index];
          data.page = saveObj.page;
          data.save();
       } else {
@@ -64,7 +63,7 @@ var updateValues = function (argObj) {
    // obj, models, add, run
    if (!argObj.run.isRunning) { // only modify when the app isn't running
       Object.keys(valueObj).forEach(function (type) { // loop trough the data sent in the POST request
-         if ((type === 'keywords' || type === 'cities') && Array.isArray(valueObj[type])) { // only take into consideration the two types
+         if ((type === 'queries' || type === 'locations') && Array.isArray(valueObj[type])) { // only take into consideration the two types
             valueObj[type] = valueObj[type].filter(function (currentItem) { // data sanitizer
                return typeof currentItem === 'string' && currentItem.length <= 60 && currentItem;
             });
