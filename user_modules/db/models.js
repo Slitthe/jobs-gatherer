@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/jobs_gatherer_demo');
 
 var models = function() {
+   // Mongoose Schemas
    var schemas = {
       job: new mongoose.Schema({
          url: String,
@@ -12,7 +13,7 @@ var models = function() {
          filterCat: {
             type: String,
             default: 'default'
-            // other possible values: 'saved', 'deleted', affected front end visibility only
+            // other possible values: 'saved', 'deleted', affectes front end visibility only
          },
          updateDate: {
             type: Date,
@@ -40,18 +41,19 @@ var models = function() {
       })
    };
 
+   // Mongoose models, based on the previous schema
    var models = {
       searchData: mongoose.model('searchData', schemas.searchData),
       value:  mongoose.model('Value', schemas.value)
    }
 
-  
+   // make a model for each site
    for (let i = 0; i < data.sites.length; i++) {
       let modelName = data.sites[i][0].toUpperCase() + data.sites[i].substring(1); // uppercases the first letter of the site
       models[data.sites[i]] = mongoose.model(modelName, schemas.job);
    }
 
-   return models;
+   return models; // only return the models
 }();
 
 module.exports = models;

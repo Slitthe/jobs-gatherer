@@ -3,12 +3,25 @@ body {
    padding-left: 10px;
    padding-right: 10px;
 }
-
+   /* matches the margin of Bootstrap's 'row' class */
 .row-margin {
    margin-left: -15px;
    margin-right: -15px;
 }
+   /* Positions something absolutely to the right with a bit of spacing */
+.absolute-right {
+   right: 5px;
+   top: 5px;
+   bottom: 5px;
+   z-index: 999;
+}
+   /* general list-group-item(s) styling and for their different status */
+.list-group-item { padding: 0; }
+.list-group-item:hover { background: rgba(82%, 82%, 82%, 0.7); }
+.list-group-item:active { background: rgba(82%, 82%, 82%, 0.9); }
+.list-group-item:focus { background: rgba(87%, 87%, 87%, 0.95); }
 
+/* Index page */
 .result-item {
    display: block;
    width: 100%;
@@ -18,29 +31,13 @@ body {
    transition-duration: 0.05s;
    box-sizing: border-box;
 }
-
-/* Positions something absolutely to the right with a bit of spacing */
-.absolute-right {
-   right: 5px;
-   top: 5px;
-   bottom: 5px;
-   z-index: 999;
-}
-
-/* list-group-item extended styling */
-.list-group-item { padding: 0; }
-.list-group-item:hover { background: rgba(82%, 82%, 82%, 0.7); }
-.list-group-item:active { background: rgba(82%, 82%, 82%, 0.9); }
-.list-group-item:focus { background: rgba(87%, 87%, 87%, 0.95); }
-
-
 .result-type { margin-bottom: 150px; }
 
-[data-status] { transition: 0.7s all linear; }
 
 
 
-/* 'LED' running status */
+/* Settings */
+   /* 'LED' running status */
 .led-green { color: rgba(40, 200, 70, 0.7); }
 .led-red { color: rgba(230, 70, 40, 0.7); }
 .led-green .led-body { background-color: rgba(40, 200, 70, 0.7); }
@@ -53,7 +50,9 @@ body {
 	border-radius: 50%;
 	box-shadow: inset 0 0 0.6em 0.2em rgba(80, 80, 80, 0.5), 0 0 0.5em 0 currentColor;
 }
-
+[data-status] { 
+   transition: 0.7s all linear; 
+}
 .current-search-item {
    background: pink;
 }

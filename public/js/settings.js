@@ -1,17 +1,12 @@
-// =========== Server Sent events =================
+//  ===================== Server Sent events
 var es = new EventSource(window.location.origin + '/settings_sse');
 
-// listen for 'update' SSE events
-es.addEventListener('update', function (evt) {
-   var data = evt.data ? JSON.parse(evt.data) : null;
-   updateData(data);
-});
-
-// handles the live status update 
+   // ---- Live search status values update
+      // handles the live status update 
 function updateData(data) {
    var target = $('[data-site="' + data.site + '"]'); // find the site's container
    var targets = [ // the values for the live status for that site
-      // target and new updated value
+      // hold the targets HTML element and the new data for that target
       [target.find('[data-status="query"]'), data.query],
       [target.find('[data-status="location"]'), data.location],
       [target.find('[data-status="page"]'), data.page],
@@ -28,7 +23,14 @@ function updateData(data) {
    });
 }
 
-// running state status update upong recieving a Server Sent Event type of 'stoppedStatus'
+      // listen for 'update' SSE events
+es.addEventListener('update', function (evt) {
+   var data = evt.data ? JSON.parse(evt.data) : null;
+   updateData(data);
+});
+
+
+   // ------- search service run state
 es.addEventListener('stoppedStatus', function (evt) {
    if (evt.data === 'true') {
       $('.state-display .state-text').text('Stopped');
@@ -45,18 +47,15 @@ es.addEventListener('stoppedStatus', function (evt) {
 
 
 
-// =========== Run state & Input disabling ==========
+//  ===================== Run state & Input disabling
 function disableInputs() { // disables the inputs related to data change when the search service is running
    if (runState.isRunning) {
       $('input, button:not(.close), select').prop('disabled', 'true');
       $('.start-stop  button').prop('disabled', '');
-
    } else {
       $('input, button, select').prop('disabled', '');
    }
 }
-
-
 
 // getter and setter for the runState
 Object.defineProperty(runState, 'isRunning', {
@@ -68,7 +67,7 @@ Object.defineProperty(runState, 'isRunning', {
       return disableInputs(); // disable/re-enables the input on state change
    }
 });
-// ======== End of Run state & Input disabling ===============
+//  ===================== End of Run state & Input disabling
 
 
 // ======== DATA modifying add/remove =====================
@@ -80,18 +79,16 @@ function modifyData(thisContext, type, value, add, evt) {
       type: type,
       value: value
    };
-   console.log(sentData);
-   let condition = add ? true : !add && window.confirm('Are you sure you want to delete ' + value + 'from the list?') ? true : false;
-   if (condition) {
+   // checks if 'add' is valid
+   let validity = add ? true : !add && window.confirm('Are you sure you want to delete ' + value + 'from the list?') ? true : false;
+   if (validity) {
       $.ajax({
          url: window.location.origin + '/update?_method=PUT&add=' + add,
          method: 'POST',
          data: sentData,
          success: function () {
-            // if add
-            // if delete
-
-            if (add) {
+            if (add) { // succesful addition
+               // create a new HTML element if that has been added
                let appendTarget = $('#' + type),
                   copy = $(appendTarget.children('li').last()[0].outerHTML);
 
@@ -99,14 +96,14 @@ function modifyData(thisContext, type, value, add, evt) {
                copy.find('.item-text').text(value);
                appendTarget.append(copy);
                $('#value').val('');
-            } else {
+            } else { // succesful removal
                parent.remove();
             }
-
-            // do this no matter what
+            // hide the error message
             $('.error-container').addClass('d-none');
          },
          error: function (err) {
+            // display the appropiate error message
             $('.error-container').removeClass('d-none');
             let errorText = {
                alredyRunning: 'The search service must be stopped before making any changes.',
@@ -122,13 +119,13 @@ function modifyData(thisContext, type, value, add, evt) {
    }
 }
 
-// add
+// use the modify data function to add values
 $('.modify-form').submit(function (evt) {
    var type = $(this).find('#type').val();
    var value = $(this).find('#value').val();
    modifyData(this, type, value, true, evt);
 });
-// remove
+// use the modify data function to remove values
 $('ul').on('click', '.remove-item', function (evt) {
    var parent = $(this).parent();
    var type = parent.parents('ul').attr('id');
@@ -149,11 +146,11 @@ function runAction(action) {
             action: action
          },
          success: function () {
+            // change the runnin state information
             window.runState.isRunning = action === 'start' ? true : false;
             if (action === 'stop') {
                $('.stop').addClass('active');
                $('.start').removeClass('active');
-
             } else if (action === 'start') {
                $('.stop').removeClass('active');
                $('.start').addClass('active');
@@ -171,9 +168,12 @@ $('.start').on('click', function () {
    runAction('start');
 });
 
-// error alert toggler
+// error alert button hider
 $('.close').on('click', function () {
    $(this).parent().toggleClass('d-none');
 });
 
-disableInputs();
+// functions to run at page load
+$(document).ready(function() {
+   disableInputs();
+});

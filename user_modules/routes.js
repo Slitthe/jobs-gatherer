@@ -1,7 +1,9 @@
 // -----------------------------------routes dependencies-----------------------------------
+const colors = require('colors'),
+      request = require('request');
+
 const search = require('./search'),
       helpers = require('./helpers'),
-      request = require('request'),
       db = {
          methods: require('./db/methods'),
          models: require('./db/models')
@@ -12,9 +14,11 @@ const search = require('./search'),
 // ------------------------------------routes functions------------------------------------
 var funcs = {};
 
+// pause or resume the search functionality
 funcs.runAction = function(req, res, push) {
    let action = req.body.action || null;
-   if (action === 'stop' || action === 'start') {
+   if (action === 'stop' || action === 'start') { // simple route data input checker
+      // resume the serach
       if (action === 'start') {
          search.run.start({
             runner: search.starter,
@@ -28,11 +32,10 @@ funcs.runAction = function(req, res, push) {
             },
             push: push
          });
-
-      } else {
+      } else { // cancel the search
          search.run.cancel(push);
       }
-      res.send('');
+      res.send(''); // send a blank susscesful response
    } else { // only accepts 'stop' or 'start' actions, anything else is invalid request
       res.status(400);
       res.send('');
@@ -40,19 +43,21 @@ funcs.runAction = function(req, res, push) {
 };
 
 
-
+// add or remove search parameters items
 funcs.update = function(req, res) {
+   // input data checker
    var add = req.query.add === 'false' || req.query.add === 'true' ? req.query.add : null;
    var   correctData = req.body && req.body.hasOwnProperty('type') && typeof req.body.type === 'string';
          correctData = correctData && req.body.hasOwnProperty('value') && typeof req.body.value === 'string';
 
    // only proceeds if the data is correct
    if (add && correctData) {
-      let type = req.body.type;
-      let value = req.body.value;
+      let   type = req.body.type,
+            value = req.body.value;
 
       // doesn't modify if the search service is running
       if (!search.run.isRunning) {
+         // length checkers
          let   dataLength = data[type] ? data[type].length : 0,
                valueLength = value.length;
 
@@ -64,6 +69,7 @@ funcs.update = function(req, res) {
             // every piece of data was the correct format/length
             let returnObj = {};
             returnObj[type] = [value];
+            // add/remove that search parameter value from the DB
             db.methods.updateValues(
                {
                   valueObj: returnObj,
@@ -73,7 +79,6 @@ funcs.update = function(req, res) {
                   data: data,
                }
             );
-            //// obj, models, add, run
             res.send('success');
          } else { // doesn't allow for the deletion of the last item in the category
             res.status(400);
@@ -90,20 +95,22 @@ funcs.update = function(req, res) {
    }
 };
 
+// update the category that a single job results belong in, site specific
 funcs.catUpdate = function (req, res) {
    let   types = data.types,
          site = req.params.site,
          type = req.body.type.toLowerCase(),
          id = req.params.id;
 
-   if (db.models[site] && types.indexOf(req.body.type) > -1) { // update if type is valid and a model for that site exists
+   // update if type is valid and a model for that site exists
+   if (db.models[site] && types.indexOf(req.body.type) > -1) { 
       db.models[site].findByIdAndUpdate(id, { // update that entry with the new category
          $set: {
             filterCat: type
          }
-      }, function (err, data) { // handle errors and respond to the request so the Front End AJAX can handle changes
+      }, function (err, data) { // handle errors and respond to the request so that the front end is notified of changes
          if (!err) {
-            console.log('Updated ' + Date.now()); // update the expiry date
+            console.log('Updated: ' + colors.bold(data.title) + ' |=| New Category: ' + colors.bold(type));
             res.send('Updated');
          } else {
             res.status(401);
@@ -113,6 +120,7 @@ funcs.catUpdate = function (req, res) {
    }
 };
 
+// displays the index page for a specific site
 funcs.index = function(req, res) {
    var site = req.params.site;
 

@@ -5,18 +5,21 @@
    <nav class='container my-5'>
       <a class='btn btn-link' href='/'>‹‹ Go Home</a>
    </nav>
+
    <main class='container my-5'>
       
-      <!-- The live status update -->
+      <!-- Live status update -->
       <section class='status'>
          <h1 class='mb-0 h2 row-margin' >Live search status</h1>
          <table class='table table-bordered my-5 row-margin'>
+            <!-- Table headers -->
             <tr>
                <th class='bg-light'>Site</th>
                <th>Query</th>
                <th>Location</th>
                <th>Page</th>
             </tr>
+            <!-- site specific row -->
             <% data.sites.forEach(function(site) { %>
                <tr data-site='<%= site%>'>
                   <td class='bg-light'><%= site%></td>
@@ -32,32 +35,25 @@
       <section>
          <h1 class='h2 row-margin'>Search Data</h1>
          <div class='row'>
-            <ul class='list-group mb-5 col-md' id='queries'>
-               <h2>Queries</h2>
-               <% data.queries.forEach(function(query) { %>
-                  <li class='list-group-item px-1 position-relative py-2' data-item='<%= query %>'>
-                     <span class='item-text'><%=query %></span>
-                     <button class='remove-item btn btn-danger position-absolute absolute-right'>
-                        <i class='fa fa-trash'></i>
-                     </button>
-                  </li>
-               <% }) %>
-            </ul>
-            <ul class='list-group mb-5 col-md' id='locations'>
-               <h2>Locations</h2>
-               <% data.locations.forEach(function(location) { %>
-                  <li class='list-group-item px-1 position-relative py-2' data-item='<%= location %>'>
-                     <span class='item-text'><%=location%></span>
-                     <button class='remove-item btn btn-danger position-absolute absolute-right'>
-                        <i class='fa fa-trash'></i>
-                     </button>
-                  </li>
-               <% }) %>
-            </ul>
+            <% var types = ['queries', 'locations'] %>
+            <% types.forEach(function(type) { %>
+            <!-- Individual list -->
+            <ul class='list-group mt-2 mb-5 col-md' id='<%= type %>'>
+                  <h2><%= type[0].toUpperCase() + type.substring(1) %></h2>
+                  <% data[type].forEach(function(currentType) { %>
+                     <li class='list-group-item px-1 position-relative py-2' data-item='<%= currentType %>'>
+                        <span class='item-text'><%=currentType %></span>
+                        <button class='remove-item btn btn-danger position-absolute absolute-right'>
+                           <i class='fa fa-trash'></i>
+                        </button>
+                     </li>
+                  <% }) %>
+               </ul>
+            <% }) %>
          </div>
       </section>
 
-      <!-- error messaging -->
+      <!-- Error messaging -->
       <div class="alert alert-danger alert-dismissible show error-container d-none" role="alert">
          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
@@ -66,49 +62,44 @@
       </div>
 
 
-
       <!-- Run state display & change -->
       <section class='border p-2 row-margin'> 
-         <% var runClass = runState ? 'led-green' : 'led-red';%>
-         <p>
-            <h1 class='d-inline h6'>Running state:</h1>
-            <span class='led <%= runClass %> state-display'>
-               <span class='state-text'>
-                  <% if(runState) {%> 
-                     Running
-                  <% } else {%>
-                     Stopped
-                  <% } %>
-               </span>
-               <span class='led-body'></span>
-            </span>
-         </p>
+         <h1 class='d-inline h6'>Running state:</h1>
+         <% var runClass = runState ? 'led-green' : 'led-red' %>
+         <% var runText = runState ? 'Running' : 'Stopped' %>
          
-         <p class='text-muted'>The service must be stopped in order to modify the data</p>
-         <div>
-            <div class='btn-group start-stop'>
-               <button class='btn btn-danger stop'>STOP</button>
-               <button class='btn btn-success start'>START</button>  
-            </div>
+         <div class='led <%= runClass %> state-display'>
+            <span class='state-text'><%= runText %></span>
+            <span class='led-body'></span>
          </div>
+
+         <p class='text-muted'>The service must be stopped in order to modify the data</p>
+
+         <div class='btn-group start-stop'>
+            <button class='btn btn-danger stop'>STOP</button>
+            <button class='btn btn-success start'>START</button>  
+         </div>
+
       </section>
 
-      <!-- Add value -->
+      <!-- Add value form -->
       <section class='my-5 py-3 px-2 border row-margin'>
          <h1 class='h2'>Add value</h1>
+
          <form class='modify-form' method='POST' action='/update?_method=PUT&add=true' data-add='true'>
             <div class='form-group'>
+               <!-- Type select -->
                <label for='type'>Type</label> 
                <select class='form-control' name='type' id='type'>
                   <option value='queries'>Query</option>
                   <option value='location'>Location</option>
                </select>
             </div>
+            <!-- Value textbox -->
             <div class='form-group'>
                <label for='value'>Value</label> 
                <input class='form-control' type='text' id='value' name='value' placeholder='New value to add.'  minlength='1' maxlength='60' pattern='(.*?){1,60}' required>
             </div> 
-            <!--minlength='1' maxlength='60' -->
             <input class='btn btn-primary' type='submit'>
          </form>
       </section>
@@ -116,9 +107,7 @@
    </main>
 
    <script>
-      var runState = {
-         value: <%= runState %>
-      };
+      var runState = { value: <%= runState %> };
    </script>
    <script src='/js/settings.js'></script>
 

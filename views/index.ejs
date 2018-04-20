@@ -5,6 +5,7 @@
    <nav class='container my-5'>
       <a class='btn btn-link' href='/'>‹‹ Go Home</a>
    </nav>
+
    <main class='container my-5'>
       <h1><%= site.toUpperCase() %></h1>
 
@@ -16,10 +17,11 @@
 
                <% data.locations.forEach(function(location) { %>
                   <% var delClass = type === 'deleted' ? 'd-none deleted-result': '' %>
-
+                  <!-- Location -->
                   <ul class='list-group mb-5' data-location='<%= location %>' data-hidden='true'>
                      <li class='list-group-item row text-center py-2 text-white bg-dark' >
                         <h1 class='h4'><%= location %> 
+                           <!-- Location results counter -->
                            (<span class='counter'><%= results[type][location] ? results[type][location].length : 0 %></span>)
                         </h1>
                      </li>
