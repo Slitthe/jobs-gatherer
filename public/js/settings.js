@@ -7,9 +7,9 @@ function updateData(data) {
    var target = $('[data-site="' + data.site + '"]'); // find the site's container
    var targets = [ // the values for the live status for that site
       // hold the targets HTML element and the new data for that target
-      [target.find('[data-status="query"]'), data.query],
-      [target.find('[data-status="location"]'), data.location],
-      [target.find('[data-status="page"]'), data.page],
+      [target.find('[data-status="query"]'), String(data.query)],
+      [target.find('[data-status="location"]'), String(data.location)],
+      [target.find('[data-status="page"]'), String(data.page)],
    ];
 
    targets.forEach(function (target) {
@@ -22,6 +22,10 @@ function updateData(data) {
       }
    });
 }
+
+es.addEventListener('reqErr', function() {
+   console.log('Request error');
+});
 
       // listen for 'update' SSE events
 es.addEventListener('update', function (evt) {
@@ -77,7 +81,7 @@ function modifyData(thisContext, type, value, add, evt) {
    var parent = $(thisContext).parent();
    var sentData = {
       type: type,
-      value: value
+      value: value.toLowerCase()
    };
    // checks if 'add' is valid
    let validity = add ? true : !add && window.confirm('Are you sure you want to delete ' + value + 'from the list?') ? true : false;
@@ -122,8 +126,11 @@ function modifyData(thisContext, type, value, add, evt) {
 // use the modify data function to add values
 $('.modify-form').submit(function (evt) {
    var type = $(this).find('#type').val();
-   var value = $(this).find('#value').val();
+   var value = $(this).find('#value').val().toLowerCase();
    modifyData(this, type, value, true, evt);
+});
+$('.modify-form').on('input', 'input', function(evt) {
+   this.value = this.value.toLowerCase();
 });
 // use the modify data function to remove values
 $('ul').on('click', '.remove-item', function (evt) {

@@ -14,13 +14,13 @@
          <table class='table table-bordered my-5 row-margin'>
             <!-- Table headers -->
             <tr>
-               <th class='bg-light'>Site</th>
+               <th cldataass='bg-light'>Site</th>
                <th>Query</th>
                <th>Location</th>
                <th>Page</th>
             </tr>
             <!-- site specific row -->
-            <% data.sites.forEach(function(site) { %>
+            <% sites.forEach(function(site) { %>
                <tr data-site='<%= site%>'>
                   <td class='bg-light'><%= site%></td>
                   <td data-status='query'></td>
@@ -92,7 +92,7 @@
                <label for='type'>Type</label> 
                <select class='form-control' name='type' id='type'>
                   <option value='queries'>Query</option>
-                  <option value='location'>Location</option>
+                  <option value='locations'>Location</option>
                </select>
             </div>
             <!-- Value textbox -->
