@@ -1,72 +1,8 @@
 const colors = require('colors'); // package to easily use terminal colors for console.log(s)
 
-// endpoint URL request creator given the: QUERY, LOCATION and PAGE for a site
-var getUrls = function () {
-   // base urls
-   var urls = {
-      ejobs: 'https://www.ejobs.ro/locuri-de-munca/',
-      bestjobs: 'https://www.bestjobs.eu/ro/locuri-de-munca/relevant/',
-   };
-   // final URL constructed
-   var reqUrls = function (page, query, location, site) {
-      site = site.toLowerCase();
-      query = encodeURI(query); // make the query URL-friendly
-      var siteUrls = { // URL constructors for each site
-         ejobs: urls.ejobs + location + '/' + query + '/page' + page + '/',
-         bestjobs: urls.bestjobs + page + '?keyword=' + query + '&location=' + location
-      };
-      return siteUrls[site]; // result of the constructor for the input 'site'
-   };
-   
-   return reqUrls;
-}();
-
-// sites-specific HTML string response parsers
-var parse = function () {
-   // expressions used for parsing as a private variables in a function closure
-   var expressions = {
-      removeWs: /\n|\r/gim, // remove whitespace so the RegExp won't need multi-line input
-      ejobs: {
-         items: /dataLayerItemLink.*?<\/a>/gi, // find the job results, the RegExp which captures each href and name for a job listing
-         href: /href="(.*?)"/gi, // find the link of that job result
-         name: />(.*?)<\/a>/gi // name of the job ad title
-      },
-      bestjobs: {
-         items: /job-title.*?<\/a>/gi,
-         href: /href="(.*?)\?/gi,
-         name: /<strong.*?>(.*?)<\/strong>/gi
-      }
-   };
-
-   var parseData = function (data) {
-      var htmlString = data.str; // the response HTML (as a string)
-      var site = data.site; // what site this HTML came from
 
 
-      htmlString = htmlString.replace(expressions.removeWs, ' '); // remove white space (to not need to work multi-line in RegExp)
-      var exp = expressions[site]; // get the expressions object for the input site
 
-      // Uses the 'items' expression to determine how many results are on the page
-      items = htmlString.match(exp.items);
-
-      if (items) {
-         // if results were found, replace each member of the 'items' array with {title: String, url: String} type of results
-         items = items.map(function (curr) {
-            var href = curr.match(exp.href)[0]; // get the part which contains the url
-            href = href.replace(exp.href, '$1'); // actually extract the url with RegExp capture groups and .replace()
-
-            var name = curr.match(exp.name)[0];
-            name = name.replace(exp.name, '$1');
-
-            return { title: name, url: href };
-         });
-      }
-
-      return items;
-   };
-
-   return parseData;
-}();
 
 
 // invokes the necessary functions needed to start the search feature with the right values
@@ -78,9 +14,11 @@ var starter = function (argObj) {
    valuesList.prototype.getValue = function() {
       return this.values[this.index];
    };
+
    argObj.data.getData(
       {
          models: argObj.db.models,
+         sitesInfo: argObj.sitesInfo,
          callback: function (dataRes) {
             dataRes.sites.forEach(function (site) {
                argObj.db.models.value.findOne({ site: site }, function (err, dbValues) {
@@ -116,7 +54,8 @@ var starter = function (argObj) {
                      removeExpired: argObj.db.methods.removeExpired,
                      saveValues: argObj.db.methods.saveValues,
                      randomRange: argObj.helpers.randomRange,
-                     run: argObj.search.run
+                     run: argObj.search.run,
+                     sitesInfo: argObj.sitesInfo
                   });
 
                }); // models values find
@@ -156,18 +95,24 @@ var repeat = function (argObj, func, increment) {
 function infiniteRepeat(argObj) {
    let params = argObj.searchParams;
    if (argObj.run.continue) { // prevents running if serach is stopped
-      argObj.removeExpired(argObj.models, argObj.data.sites); // remove any expired DB entries
+      argObj.removeExpired(argObj.models, argObj.sitesInfo.sites); // remove any expired DB entries
       argObj.saveValues(params, argObj.models); // save indices of the search paramaters & current page to DB
 
-      var url = getUrls(params.page, params.queries.getValue(), params.locations.getValue(), params.site); // create req URL
+      var url = argObj.sitesInfo.getUrls(params.page, params.queries.getValue(), params.locations.getValue(), params.site); // create req URL
 
-      console.log(colors.cyan.bold('QUERY: ') + colors.underline(params.queries.getValue()) + colors.cyan.bold('   LOCATION: ') + colors.underline(params.locations.getValue()) + colors.cyan.bold('   PAGE:') + colors.underline(params.page));
+      console.log(colors.cyan.bold('QUERY: ') + colors.underline(params.queries.getValue()) + colors.cyan.bold('   LOCATION: ') + colors.underline(params.locations.getValue()) + colors.cyan.bold('   PAGE:') + colors.underline(params.page), '   ' + colors.cyan.bold(params.site));
 
       argObj.request(url, function (err, response, body) { // makes the request
+         params.push('update', { // send a SSE for status update on the front-end
+            query: params.queries.getValue(),
+            location: params.locations.getValue(),
+            page: params.page,
+            site: params.site
+         });
 
          if (!err && response.statusCode === 200) { // successful request
             params.tryCount = 1;
-            let   parsed = argObj.parse({ str: body, site: params.site }); // parsed HTML response to extract the jobs listing (if any)
+            let   parsed = argObj.sitesInfo.parse({ str: body, site: params.site }); // parsed HTML response to extract the jobs listing (if any)
             if (parsed) { // 1 or more results (otherwise parsed is null)
                argObj.addResults(
                   {
@@ -185,16 +130,11 @@ function infiniteRepeat(argObj) {
                params.page = 1; // reset the page
                argObj.repeat(argObj, infiniteRepeat, true); // increment the queries/locations when there are no results for the current page
             }
-            params.push('update', { // send a SSE for status update on the front-end
-               query: params.queries.getValue(),
-               location: params.locations.getValue(),
-               page: params.page,
-               site: params.site
-            });
 
 
          } else {
             // request error
+            params.push('reqErr', {});
             if (params.tryCount < 3) { // try again for a maximum of 'n' times (curent: 3)
                params.tryCount++;
                argObj.repeat(argObj, infiniteRepeat, false);
@@ -242,7 +182,5 @@ module.exports = {
    infiniteRepeat: infiniteRepeat,
    repeat: repeat,
    starter: starter,
-   getUrls: getUrls,
-   parse: parse,
    run: run
 };

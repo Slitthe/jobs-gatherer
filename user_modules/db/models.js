@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
-      data = require('../data');
+      data = require('../data'),
+      sitesInfo = require('../sites');
 
 mongoose.connect('mongodb://localhost/jobs_gatherer_demo');
 
@@ -48,9 +49,9 @@ var models = function() {
    }
 
    // make a model for each site
-   for (let i = 0; i < data.sites.length; i++) {
-      let modelName = data.sites[i][0].toUpperCase() + data.sites[i].substring(1); // uppercases the first letter of the site
-      models[data.sites[i]] = mongoose.model(modelName, schemas.job);
+   for (let i = 0; i < sitesInfo.sites.length; i++) {
+      let modelName = sitesInfo.sites[i][0].toUpperCase() + sitesInfo.sites[i].substring(1); // uppercases the first letter of the site
+      models[sitesInfo.sites[i]] = mongoose.model(modelName, schemas.job);
    }
 
    return models; // only return the models

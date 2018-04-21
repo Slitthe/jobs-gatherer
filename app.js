@@ -14,7 +14,8 @@ const helpers = require('./user_modules/helpers'),
          methods: require('./user_modules/db/methods'),
          models: require('./user_modules/db/models')
       },
-      search = require('./user_modules/search');
+      search = require('./user_modules/search'),
+      sitesInfo = require('./user_modules/sites');
 
    // Dependencies initialization
 const push = ssePusher(),
@@ -44,5 +45,6 @@ search.starter({
    helpers: helpers,
    data: data,
    push: push,
-   request: request
+   request: request,
+   sitesInfo: sitesInfo
 });

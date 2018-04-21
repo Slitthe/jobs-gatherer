@@ -8,7 +8,8 @@ const search = require('./search'),
          methods: require('./db/methods'),
          models: require('./db/models')
       },
-      data = require('./data');
+      data = require('./data'),
+      sitesInfo = require('./sites');
     
 
 // ------------------------------------routes functions------------------------------------
@@ -28,7 +29,8 @@ funcs.runAction = function(req, res, push) {
                helpers: helpers,
                data: data,
                push: push,
-               request: request
+               request: request,
+               sitesInfo: sitesInfo
             },
             push: push
          });
@@ -148,12 +150,12 @@ funcs.index = function(req, res) {
 var routes = function(app, push) {
    // Home
 	app.get('/' ,function(req, res) {
-		res.render('home', {sites: data.sites});
+      res.render('home', { sites: sitesInfo.sites});
    });
 
    // Settings
    app.get('/settings', function(req, res) {
-      res.render('settings', {data: data, runState: search.run.isRunning});
+      res.render('settings', { data: data, runState: search.run.isRunning, sites: sitesInfo.sites});
    });
 
    // stop/start the search

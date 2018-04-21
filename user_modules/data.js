@@ -26,11 +26,7 @@ exportData.locations = [
    'cluj-napoca'
 ];
 
-// The sites to search in, needs to match all the other variable names where they are also used
-exportData.sites = [
-   'ejobs',
-   'bestjobs'
-];
+
 
 // items categorization types
 exportData.types = [
@@ -42,6 +38,7 @@ exportData.types = [
 
 // call a function with either the DB data or the default data (fallback for inexistent DB or error)
 exportData.getData = function(argObj) {
+   exportData.sites = argObj.sitesInfo.sites;
    var types = ['queries', 'locations'];
    argObj.models.searchData.find({}, function(err, dbResults) {
       if(!err && dbResults) {
