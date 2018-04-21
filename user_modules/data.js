@@ -65,6 +65,19 @@ exportData.getData = function(argObj) {
 
 };
 
+exportData.appRunning = function() {
+   var value = false;
+   getValue = function () {
+      return this.value;
+   };
+   turnOn = function () {
+      this.value = true;
+   };
+   return {
+      getValue: getValue,
+      turnOn: turnOn
+   };
+}();
 
 
 

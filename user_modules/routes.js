@@ -145,42 +145,83 @@ funcs.index = function(req, res) {
    }
 };
 
+function appRunningResponse(req, res, func, args) {
+   if(!data.appRunning.getValue()) {
+      res.redirect('/start')
+   } else {
+      func.apply(this, args);
+   }
+}
+
       
 // -----------------------------------app -> express; push -> server sent events-----------------------------------
 var routes = function(app, push) {
    // Home
 	app.get('/' ,function(req, res) {
-      res.render('home', { sites: sitesInfo.sites});
+      appRunningResponse(req, res, function () {
+         res.render('home', { sites: sitesstartInfo.sites });
+      }, []);
+   });
+   app.get('/start', function(req, res) {
+      if (!data.appRunning.getValue()) {
+         // res.send('Select the sites to start the app');
+         res.render('start', {sites: sitesInfo.sites});
+      } else {
+         res.render('404');
+      }
+   });
+
+   app.post('/start', function(req, res) {
+      inputSites = req.body.sites || null;
+      if(!data.appRunning.getValue()) {
+         if(inputSites) {
+            inputSites = typeof inputSites === 'string' ? [inputSites] : inputSites;  
+            inputSites = Array.isArray(inputSites) ? inputSites : null;
+
+            console.log( helpers.isPartOfTheOther(inputSites, sitesInfo.sites) );
+            data.appRunning.turnOn();
+            // res.redirect('/');
+         } else {
+            res.send('error');
+         }
+      } else {
+         res.redirect('404')
+      }
    });
 
    // Settings
    app.get('/settings', function(req, res) {
-      res.render('settings', { data: data, runState: search.run.isRunning, sites: sitesInfo.sites});
+      appRunningResponse(req, res, function () {
+         res.render('settings', { data: data, runState: search.run.isRunning, sites: sitesInfo.sites});
+      }, []);
    });
-
+   
    // stop/start the search
    app.post('/runAction', function(req, res) {
-      funcs.runAction(req, res, push);
+      appRunningResponse(req, res, funcs.runAction, [req, res, push]);
    });
 
    // add/remove a value
    app.put('/update', function (req, res) {
-      funcs.update(req, res);
+      appRunningResponse(req, res, funcs.update, [req, res]);      
    });
 
    // update the category of a rersult
    app.put('/:site/:id', function(req, res) { 
-      funcs.catUpdate(req, res);
+      appRunningResponse(req, res, funcs.catUpdate, [req, res]);            
    });
 
    // index page for the results, site specific
 	app.get('/:site', function(req, res) {
-      funcs.index(req, res);
+      appRunningResponse(req, res, funcs.index, [req, res]);                  
    });
 
    // generic 404 page
    app.get('*', function(req, res) {
-      res.render('404');
+      appRunningResponse(req, res, function () {
+         res.status(404);
+         res.render('404');
+      }, []);
    });
 };
 

@@ -87,10 +87,35 @@ var btnGroups = function (type) {
    };
 }();
 
+// checks if all the members of the 1st array are a part of the 2nd one
+var isPartOfTheOther = function(arr1, arr2) {
+   var areArrays = Array.isArray(arr1) && Array.isArray(arr2);
+   
+   if(areArrays) {
+      for (let i = 0; i < arr1.length; i++) {
+         for (let j = 0; j < arr2.length; j++) {
+            if (arr1[i] === arr2[j]) {
+               break;
+            }
+            if (j === arr2.length - 1) {
+               return false;
+            }
+         }
+         if (i === arr1.length - 1) {
+            return true;
+         }
+      }
+   }
+
+
+   return false;
+};
+
 
 module.exports = {
    duplicateChecker: duplicateChecker,
    randomRange: randomRange,
    dataSplitter: dataSplitter,
    btnGroups: btnGroups,
+   isPartOfTheOther: isPartOfTheOther
 };

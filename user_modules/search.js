@@ -101,6 +101,7 @@ function infiniteRepeat(argObj) {
       var url = argObj.sitesInfo.getUrls(params.page, params.queries.getValue(), params.locations.getValue(), params.site); // create req URL
 
       console.log(colors.cyan.bold('QUERY: ') + colors.underline(params.queries.getValue()) + colors.cyan.bold('   LOCATION: ') + colors.underline(params.locations.getValue()) + colors.cyan.bold('   PAGE:') + colors.underline(params.page), '   ' + colors.cyan.bold(params.site));
+      console.log(colors.bold(url));
 
       argObj.request(url, function (err, response, body) { // makes the request
          params.push('update', { // send a SSE for status update on the front-end

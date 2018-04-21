@@ -29,14 +29,16 @@ app.use( express.static(__dirname + '/public') ); //public directory
 app.use( methodOverride('_method') ); // make other types of HTTP requests by using POST and "_method=METHOD" URL query argument
 app.use( bodyParser.urlencoded({extended: true}) ); // form data parsing
 
-// Routes
-routes(app, push);
+
 
 // EXPRESS start
 const portNumber = 3000;
 app.listen(portNumber, function() {
-	console.log('EXPRESS started listening on PORT: ' + portNumber);
+   console.log('EXPRESS started listening on PORT: ' + portNumber);
 });
+
+// Routes
+routes(app, push);
 
 // Search functionality start
 search.starter({

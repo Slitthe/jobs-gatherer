@@ -53,6 +53,36 @@ body {
 [data-status] { 
    transition: 0.7s all linear; 
 }
+
+/* Select sites and start the app itself page */
 .current-search-item {
    background: pink;
 }
+
+.checkbox-input + .checkbox-text { background: transparent; }
+.checkbox-input:checked + .checkbox-text {
+   background: rgba(77, 77, 77, 0.95);
+   color: white;
+}
+
+.full-size-absolute {
+   left: 0;
+   right: 0;
+   top: 0;
+   bottom: 0;
+   position: absolute;
+}
+
+.checkbox-list-item {
+   padding: 1.5em;
+   height: 0;
+   box-sizing: border-box;
+   line-height: 3em;
+}
+
+.checkbox-text:hover {
+   cursor: pointer;
+}
+
+
+/* Start the app page */
