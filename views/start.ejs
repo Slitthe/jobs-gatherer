@@ -7,47 +7,40 @@
          <h1 class='h2'>Select the sites to use</h1>
          <form action='/start' method='POST'>
             <ul class='list-group'>
-               <li class='list-group-item d-relative checkbox-list-item'>
-                  <label>
-                     <input class='d-none checkbox-input' type='checkbox' value='something' name='td'>
-                     <div class='checkbox-text text-center d-absolute full-size-absolute'>
-                        This is the text that goes inside of
-                     </div>
-                  </label>
-               </li>
-               <li class='list-group-item d-relative checkbox-list-item'>
-                  <label>
-                     <input class='d-none checkbox-input' type='checkbox' value='something' name='td'>
-                     <div class='checkbox-text text-center d-absolute full-size-absolute'>
-                        This is the text that goes inside of
-                     </div>
-                  </label>
-               </li>
-               <li class='list-group-item d-relative checkbox-list-item'>
-                  <label>
-                     <input class='d-none checkbox-input' type='checkbox' value='something' name='td'>
-                     <div class='checkbox-text text-center d-absolute full-size-absolute'>
-                        This is the text that goes inside of
-                     </div>
-                  </label>
-               </li>
-               <li class='list-group-item d-relative checkbox-list-item'>
-                  <label>
-                     <input class='d-none checkbox-input' type='checkbox' value='something' name='td'>
-                     <div class='checkbox-text text-center d-absolute full-size-absolute'>
-                        This is the text that goes inside of
-                     </div>
-                  </label>
-               </li>
+
+               <% sites.forEach(function(site) { %>
+                  <li class='list-group-item d-relative checkbox-list-item'>
+                     <label>
+                        <input class='d-none checkbox-input' type='checkbox' value='<%= site %>' name='sites'>
+                        <div class='checkbox-text text-center d-absolute full-size-absolute'>
+                           <%= site[0].toUpperCase() + site.substring(1) %>
+                        </div>
+                     </label>
+                  </li>
+               <% }) %>
+
             </ul>
 
             <button class='btn btn-primary mt-3' type='submit'>Start the app</button>
+            <p class='text-muted mt-3'>Once the application has started, the sites used cannot be changed. To do so the application must be restarted.</p>
          </form>
+
+         <!-- Error messaging -->
+         <div class="mt-5 alert alert-danger alert-dismissible show error-container d-none" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+               <span aria-hidden="true">&times;</span>
+            </button>
+            <span class='error-message'></span>
+         </div>
+
       </div>
+   
    </main>
 
 
 
    </div>
+
+   <script src='/js/start.js'></script>
 
 <% include ./partials/footer %>

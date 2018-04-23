@@ -70,7 +70,11 @@ exportData.appRunning = function() {
    getValue = function () {
       return this.value;
    };
-   turnOn = function () {
+   turnOn = function (runArgs, search) {
+      if(!this.value) {
+         runArgs.sendPush = false;
+         search.run.start(runArgs);
+      }
       this.value = true;
    };
    return {

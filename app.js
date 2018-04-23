@@ -39,14 +39,3 @@ app.listen(portNumber, function() {
 
 // Routes
 routes(app, push);
-
-// Search functionality start
-search.starter({
-   search: search,
-   db: db,
-   helpers: helpers,
-   data: data,
-   push: push,
-   request: request,
-   sitesInfo: sitesInfo
-});

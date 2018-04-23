@@ -150,7 +150,7 @@ function infiniteRepeat(argObj) {
 
 // search run info and actions related start/stop actions
 var run = {
-   continue: true,
+   continue: false,
    runTimeout: [], 
    cancel: function (push) { // cancels the search and notifies the front end via SSE
       this.continue = false;
@@ -168,14 +168,13 @@ var run = {
       if (!this.isRunning) {
          this.continue = true;
          argsObj.runner(argsObj.args);
-         if (argsObj.hasOwnProperty('push')) {
+         if (argsObj.hasOwnProperty('push') && !argsObj.sendPush) {
             argsObj.push('stoppedStatus', 'false');
          }
-      } else {
       }
    },
    get isRunning() { // get running state information
-      return !!(this.continue && this.runTimeout);
+      return !!(this.continue && this.runTimeout.length);
    }
 };
 

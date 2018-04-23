@@ -10,6 +10,8 @@ const search = require('./search'),
       },
       data = require('./data'),
       sitesInfo = require('./sites');
+
+
     
 
 // ------------------------------------routes functions------------------------------------
@@ -32,7 +34,8 @@ funcs.runAction = function(req, res, push) {
                request: request,
                sitesInfo: sitesInfo
             },
-            push: push
+            push: push,
+            sendPush: true
          });
       } else { // cancel the search
          search.run.cancel(push);
@@ -156,18 +159,20 @@ function appRunningResponse(req, res, func, args) {
       
 // -----------------------------------app -> express; push -> server sent events-----------------------------------
 var routes = function(app, push) {
+
+
    // Home
 	app.get('/' ,function(req, res) {
       appRunningResponse(req, res, function () {
-         res.render('home', { sites: sitesstartInfo.sites });
+         res.render('home', { sites: sitesInfo.sites });
       }, []);
    });
    app.get('/start', function(req, res) {
       if (!data.appRunning.getValue()) {
          // res.send('Select the sites to start the app');
-         res.render('start', {sites: sitesInfo.sites});
+         res.render('start', {sites: sitesInfo.sites, error: false});
       } else {
-         res.render('404');
+         res.render('app-running');
       }
    });
 
@@ -177,17 +182,40 @@ var routes = function(app, push) {
          if(inputSites) {
             inputSites = typeof inputSites === 'string' ? [inputSites] : inputSites;  
             inputSites = Array.isArray(inputSites) ? inputSites : null;
-
-            console.log( helpers.isPartOfTheOther(inputSites, sitesInfo.sites) );
-            data.appRunning.turnOn();
-            // res.redirect('/');
+            if (helpers.isPartOfTheOther(inputSites, sitesInfo.sites) ) {
+               sitesInfo.sites = inputSites;
+               data.appRunning.turnOn({
+                  runner: search.starter,
+                  args: {
+                     search: search,
+                     db: db,
+                     helpers: helpers,
+                     data: data,
+                     push: push,
+                     request: request,
+                     sitesInfo: sitesInfo
+                  },
+                  push: push,
+                  sendPush: true
+               }, search);
+               res.send('success');                            
+            } else {
+               res.status(400);
+               res.send('error');
+            }
          } else {
+            res.status(500);
             res.send('error');
          }
       } else {
-         res.redirect('404')
+         res.status(500);
+         res.send('error');         
       }
    });
+
+   /* 
+
+   */
 
    // Settings
    app.get('/settings', function(req, res) {
