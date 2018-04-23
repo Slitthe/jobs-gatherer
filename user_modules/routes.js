@@ -6,7 +6,8 @@ const search = require('./search'),
       helpers = require('./helpers'),
       db = {
          methods: require('./db/methods'),
-         models: require('./db/models')
+         models: require('./db/models'),
+         debugging: require('./db/debugging')
       },
       data = require('./data'),
       sitesInfo = require('./sites');
@@ -148,13 +149,60 @@ funcs.index = function(req, res) {
    }
 };
 
+funcs.startPage = function(req, res) {
+   if (!data.appRunning.getValue()) {
+      // res.send('Select the sites to start the app');
+      res.render('start', { sites: sitesInfo.sites, error: false });
+   } else {
+      res.render('app-running');
+   }
+};
+
+funcs.startAction = function(req, res, push) {
+   inputSites = req.body.sites || null;
+   if (!data.appRunning.getValue()) {
+      if (inputSites) {
+         inputSites = typeof inputSites === 'string' ? [inputSites] : inputSites;
+         inputSites = Array.isArray(inputSites) ? inputSites : null;
+         if (helpers.isPartOfTheOther(inputSites, sitesInfo.sites)) {
+            sitesInfo.sites = inputSites;
+            data.appRunning.turnOn({
+               runner: search.starter,
+               args: {
+                  search: search,
+                  db: db,
+                  helpers: helpers,
+                  data: data,
+                  push: push,
+                  request: request,
+                  sitesInfo: sitesInfo
+               },
+               push: push,
+               sendPush: true
+            }, search);
+            res.send('success');
+         } else {
+            res.status(400);
+            res.send('error');
+         }
+      } else {
+         res.status(500);
+         res.send('error');
+      }
+   } else {
+      res.status(500);
+      res.send('error');
+   }
+};
+
 function appRunningResponse(req, res, func, args) {
    if(!data.appRunning.getValue()) {
       res.redirect('/start')
    } else {
-      func.apply(this, args);
+      func.apply(this, args); 
    }
 }
+
 
       
 // -----------------------------------app -> express; push -> server sent events-----------------------------------
@@ -168,54 +216,12 @@ var routes = function(app, push) {
       }, []);
    });
    app.get('/start', function(req, res) {
-      if (!data.appRunning.getValue()) {
-         // res.send('Select the sites to start the app');
-         res.render('start', {sites: sitesInfo.sites, error: false});
-      } else {
-         res.render('app-running');
-      }
+      funcs.startPage(req, res);
    });
 
    app.post('/start', function(req, res) {
-      inputSites = req.body.sites || null;
-      if(!data.appRunning.getValue()) {
-         if(inputSites) {
-            inputSites = typeof inputSites === 'string' ? [inputSites] : inputSites;  
-            inputSites = Array.isArray(inputSites) ? inputSites : null;
-            if (helpers.isPartOfTheOther(inputSites, sitesInfo.sites) ) {
-               sitesInfo.sites = inputSites;
-               data.appRunning.turnOn({
-                  runner: search.starter,
-                  args: {
-                     search: search,
-                     db: db,
-                     helpers: helpers,
-                     data: data,
-                     push: push,
-                     request: request,
-                     sitesInfo: sitesInfo
-                  },
-                  push: push,
-                  sendPush: true
-               }, search);
-               res.send('success');                            
-            } else {
-               res.status(400);
-               res.send('error');
-            }
-         } else {
-            res.status(500);
-            res.send('error');
-         }
-      } else {
-         res.status(500);
-         res.send('error');         
-      }
+     funcs.startAction(req, res, push);
    });
-
-   /* 
-
-   */
 
    // Settings
    app.get('/settings', function(req, res) {
@@ -223,7 +229,6 @@ var routes = function(app, push) {
          res.render('settings', { data: data, runState: search.run.isRunning, sites: sitesInfo.sites});
       }, []);
    });
-   
    // stop/start the search
    app.post('/runAction', function(req, res) {
       appRunningResponse(req, res, funcs.runAction, [req, res, push]);
@@ -233,6 +238,12 @@ var routes = function(app, push) {
    app.put('/update', function (req, res) {
       appRunningResponse(req, res, funcs.update, [req, res]);      
    });
+
+   app.get('/debugging', function(req, res) {
+      db.debugging.deleteEntities('searchData', ['5addf0397718eb215d0ddaf0', '5addf0397718eb215d0ddaf1']);
+      res.render('debugging');
+   });
+
 
    // update the category of a rersult
    app.put('/:site/:id', function(req, res) { 
