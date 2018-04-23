@@ -103,10 +103,28 @@ var updateValues = function (argObj) {
    }
 };
 
+var collectionGetAll = function(collectionName, models) {
+   return new Promise(function(res, rej) {
+      try {
+         models[collectionName];
+         models[collectionName].find({}, function (err, data) {
+            if (!err && data) {
+               res({name: collectionName, data:data});
+            } else {
+               rej();
+            }
+         });
+      } catch(err) {
+         rej();
+      }
+   });
+};
+
 
 module.exports = {
    addResults: addResults,
    removeExpired: removeExpired,
    saveValues: saveValues,
-   updateValues: updateValues
+   updateValues: updateValues,
+   collectionGetAll: collectionGetAll
 };

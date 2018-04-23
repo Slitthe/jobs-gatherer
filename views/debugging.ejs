@@ -2,6 +2,24 @@
 <% title = 'Debugging Tools' %>
 <% include partials/header-bottom %>
 
+<% dataList.forEach(function(currentData) { %>
+   <% for(let i = 0; i < sites.length; i++) { %>
+      <% if ( sites[i] === currentData.name ) { %>
+         <%= sites[i] %>
+         <% continue; %>
+      <% } %>
+   <% } %>
+<% }) %> 
+
+<% dataList.forEach(function(currentData) { %>
+   <% if(currentData.name === 'searchData') {%>
+      <%= currentData.name %>
+   <% } %>
+
+   <% if(currentData.name === 'value') {%>
+      <%= currentData.name %>
+   <% } %>
+<% }) %> 
 
 
 <% include partials/footer %>

@@ -240,9 +240,40 @@ var routes = function(app, push) {
    });
 
    app.get('/debugging', function(req, res) {
-      db.debugging.deleteEntities('searchData', ['5addf0397718eb215d0ddaf0', '5addf0397718eb215d0ddaf1']);
-      res.render('debugging');
+      if (!data.appRunning.getValue()) {
+         var queryList = [];
+         var queries = db.methods.collectionGetAll('vajlue', db.models);
+         var queries = Object.keys(db.models);
+         queries.forEach(function(query) {
+            queryList.push(db.methods.collectionGetAll(query, db.models) );
+         });
+
+         var promiseAll = Promise.all(queryList);
+
+         promiseAll.then(function(dataList) {
+            res.render('debugging', {dataList: dataList, sites: sitesInfo.sites});
+         });
+
+         promiseAll.catch(function() {
+            res.send('error');
+         });
+         // query.then(function(data) {
+         //    res.send('Then');
+
+         //    // res.render('start', { sites: sitesInfo.sites, error: false });
+         // });
+
+         // query.catch(function() {
+         //    res.send('catch');
+
+         //    // res.redirect('/start');
+         // });
+      } else {
+         res.render('app-running');
+      }
    });
+
+   
 
 
    // update the category of a rersult

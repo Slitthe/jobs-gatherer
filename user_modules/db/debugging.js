@@ -29,6 +29,6 @@ var deleteEntities = function(modelName, idsList) {
 
 module.exports = {
    deleteAll: deleteAll,
-   deleteOne: deleteOne,
+   deleteCollection: deleteCollection,
    deleteEntities: deleteEntities
 };
