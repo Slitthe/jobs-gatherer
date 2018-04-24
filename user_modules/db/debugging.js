@@ -17,14 +17,21 @@ var deleteCollection = function(modelName) {
 };
 
 var deleteEntities = function(modelName, idsList) {
-   console.log(modelName, idsList, Array.isArray(idsList));
-   if (modelsKeys.indexOf(modelName) !== -1 && Array.isArray(idsList)) {
-      idsList.forEach(function(id) {
-         models[modelName].findByIdAndRemove(id, function(err, data){
-            console.log(data);
+   return new Promise(function(res, rej) {
+      if (modelsKeys.indexOf(modelName) !== -1 && Array.isArray(idsList)) {
+         idsList.forEach(function(id) {
+            models[modelName].findByIdAndRemove(id, function(err, data){
+               if(!err) {
+                  res();
+               } else {
+                  rej();
+               }
+            });
          });
-      });
-   }
+      } else {
+         rej();
+      }
+   });
 };
 
 var locationSplit = function (dataList, sites) {

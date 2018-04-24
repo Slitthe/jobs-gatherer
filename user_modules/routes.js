@@ -274,7 +274,21 @@ var routes = function(app, push) {
       }
    });
 
-   
+   app.delete('/debugging', function(req, res) {
+      let deleteList = req.body.deleteList || null;
+      let promiseList = [];
+      if(deleteList) {
+         Object.keys(deleteList).forEach(function(currentModel) {
+            promiseList.push( db.debugging.deleteEntities(currentModel, deleteList[currentModel]) );
+         });
+      }
+      Promise.all(promiseList).then(function() {
+         res.send('success');
+      }).catch(function() {
+         res.status(500);
+         res.send('failure');
+      });
+   });
 
 
    // update the category of a rersult

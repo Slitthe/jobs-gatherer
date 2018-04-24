@@ -3,24 +3,23 @@
 <% include partials/header-bottom %>
 
 <div class='destructor display-inline-block'>
-   <button class='btn btn-danger px-5 py-2'>Hello</button>
+   <button class='btn btn-danger px-5 py-2'>Delete Selected</button>
 </div>
 
 <div class='confirm-dialog-box d-none'>
    <div class='close-dialog bg-danger position-absolute'>&times;</div>
-   <label class='dialog-input-container'>
-      <div class='dialog-text my-2 text-left'>asdasd</div>
-      <input class='dialog-input form-control' type='text' name='dialog' value='' placeholder='Type in the shown value in order to confirm the deletions.'>
-   </label>
-
-   <button class='btn btn-primary mt-2'>Proceed</div>
+   <form class='dialog-form' method='POST'>
+      <div class='dialog-text my-2 text-left text-light'>asdasd</div>
+      <input class='dialog-input form-control' type='text' name='dialog' value='' placeholder='Are you sure?'>
+      <button type='submit' class='btn btn-primary mt-2'>Proceed</div>
+   </form>
 </div>
 
 
 <% dataList.forEach(function(currentData) { %>
    <% for(let i = 0; i < sites.length; i++) { %>
       <% if ( sites[i] === currentData.name ) { %>
-         <div class='container-fluid data-container top-margin-space'>
+         <div class='container-fluid data-container top-margin-space' data-name='<%=currentData.name%>'>
          <div class='container-info position-absolute'>
             <h1>Results: <%= currentData.name %></h1>
             <div class='text-muted'>The results for each site and their respective location.</div>
@@ -49,8 +48,8 @@
 <% dataList.forEach(function(currentData) { %>
    
    <% if ( currentData.name === 'value' ) { %>
-      <div class='container-fluid data-container top-margin-space'>
-               <div class='container-info position-absolute'>
+      <div class='container-fluid data-container top-margin-space' data-name='<%=currentData.name%>'>
+            <div class='container-info position-absolute'>
             <h1> Current search info </h1>
             <div class='text-muted'>Current search parameters for each site. Their deletion will make the search from the beginning.</div>
          </div>
@@ -79,7 +78,7 @@
 <% dataList.forEach(function(currentData) { %>
 
    <% if ( currentData.name === 'searchData' ) { %>
-      <div class='container-fluid data-container top-margin-space'>
+      <div class='container-fluid data-container top-margin-space' data-name='<%=currentData.name%>'>
 
          <div class='container-info position-absolute'>
             <h1> Search parameters list </h1>
