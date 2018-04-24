@@ -85,4 +85,125 @@ body {
 }
 
 
+
+
+
+.data-container {
+   padding: 3rem;
+
+   border: 1px solid gray;
+   cursor: pointer;
+}
+.top-margin-space {
+      margin-top: 90px;
+}
+
+.data-container:hover {
+   background: rgba(0,0,0,0.15);
+}
+
+.data-container > .data-container:hover {
+   background: rgba(0,0,0,0.23);
+}
+.data-container > .data-container > .data-container:hover {
+   background: rgba(0,0,0,0.35);
+}
+.individual-result:hover {
+   background: rgba(0,0,0,0.45);
+}
+.data-container label:first-of-type {
+   margin-top: 90px;
+}
+.data-container label {
+   display: block;
+   cursor: pointer;
+}
+
+.to-delete-checkbox:checked + .checkbox-bg {
+   background: rgba(0,0,0,0.7);
+   z-index: -1;
+}
+.to-delete-checkbox:checked ~ * {
+   color: rgb(200, 200, 200);
+}
+
+.data-container ul {
+   list-style-type: none;
+}
+.data-container li {
+   padding: 0.5em;
+   border: 1px solid rgb(64, 64, 64);
+}
+
+.text-bold {
+   font-weight: bold;
+}
+.text-italic {
+   font-style: italic;
+}
+.text-underline {
+   text-decoration: underline;
+}
+
+.destructor {
+   position: fixed;
+   right: 15px;
+   bottom: 15px;
+   z-index: 20;
+}
+
+.confirm-dialog-box {
+   z-index: 20;
+   position: fixed;
+   top: 20px;
+   left: 20%;
+   right: 20%;
+   padding: 2em 5em;
+   background: gray;
+   border-radius: 10px;
+}
+
+.confirm-dialog-box {
+   text-align: center;
+}
+
+
+.dialog-input-container {
+   width: 100%;
+   max-width: 1000px;
+   margin: 0 auto;
+   display: block;
+}
+.dialog-input-container input {
+   width: 100%
+}
+
+
+
+@media screen and (max-width: 700px) {
+   .confirm-dialog-box {
+      left: 5%;
+      right: 5%;
+      padding: 1em 0.5em;
+   }
+}
+@media screen and (max-width: 1100px) {
+   .confirm-dialog-box {
+      left: 10%;
+      right: 10%;
+      padding: 2em 1em;
+   }
+}
+
+.close-dialog {
+   font-size: 1.2em;
+   right: 0;
+   top: 0;
+   background: white;
+   padding:0 1em;
+   border-bottom-left-radius: 5px;
+   font-weight: bold; 
+   color: white;
+   cursor: pointer;
+}
 /* Start the app page */

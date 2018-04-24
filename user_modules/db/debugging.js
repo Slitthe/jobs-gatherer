@@ -27,8 +27,32 @@ var deleteEntities = function(modelName, idsList) {
    }
 };
 
+var locationSplit = function (dataList, sites) {
+   let splitByLocation = function(results) {
+      var categorized = {};
+      results.forEach(function (result) {
+         if (!categorized.hasOwnProperty(result.location)) {
+            categorized[result.location] = [];
+         };
+         categorized[result.location].push(result);
+      });
+      return categorized;
+   };
+   dataList.sites = [];
+
+   
+   Object.keys(dataList).forEach(function(currentKey) {
+      if(sites.indexOf(dataList[currentKey].name) !== - 1) {
+         dataList[currentKey].data = splitByLocation(dataList[currentKey].data);
+      }
+   });
+
+   return dataList;
+};
+
 module.exports = {
    deleteAll: deleteAll,
    deleteCollection: deleteCollection,
-   deleteEntities: deleteEntities
+   deleteEntities: deleteEntities,
+   locationSplit: locationSplit
 };

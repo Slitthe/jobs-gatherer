@@ -251,6 +251,7 @@ var routes = function(app, push) {
          var promiseAll = Promise.all(queryList);
 
          promiseAll.then(function(dataList) {
+            dataList = db.debugging.locationSplit(dataList, sitesInfo.sites);
             res.render('debugging', {dataList: dataList, sites: sitesInfo.sites});
          });
 
