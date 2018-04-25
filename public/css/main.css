@@ -89,10 +89,9 @@ body {
 
 
 .data-container {
-   padding: 3rem;
-
    border: 1px solid gray;
    cursor: pointer;
+   word-wrap: break-word;
 }
 .top-margin-space {
       margin-top: 90px;
@@ -111,9 +110,7 @@ body {
 .individual-result:hover {
    background: rgba(0,0,0,0.45);
 }
-.data-container label:first-of-type {
-   margin-top: 90px;
-}
+
 .data-container label {
    display: block;
    cursor: pointer;
@@ -129,6 +126,7 @@ body {
 
 .data-container ul {
    list-style-type: none;
+   margin-top: 50px;
 }
 .data-container li {
    padding: 0.5em;
@@ -165,6 +163,9 @@ body {
 
 .confirm-dialog-box {
    text-align: center;
+}
+.top-level-data {
+   margin-top: 100px;
 }
 
 
@@ -206,4 +207,25 @@ body {
    color: white;
    cursor: pointer;
 }
+
+.debugging-main .h1 {
+   text-decoration: underline;
+
+}
+.debugging-main .h2 {
+  background: gray;
+  color: white;
+  padding: 0.2em 0.1em;
+}
+.debugging-main .h2, .debugging-main .h3 {
+  text-align: center;
+}
+.error-message:empty {
+   display: none;
+}
+.debugging-main {
+   margin-top: 150px;
+   margin-bottom: 50px;
+}
+
 /* Start the app page */

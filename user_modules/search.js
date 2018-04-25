@@ -165,10 +165,11 @@ var run = {
       }
    },
    start: function (argsObj) { // starts the search and notifies the front end via SSE
+      console.log(argsObj.sendPush);
       if (!this.isRunning) {
          this.continue = true;
          argsObj.runner(argsObj.args);
-         if (argsObj.hasOwnProperty('push') && !argsObj.sendPush) {
+         if (argsObj.hasOwnProperty('push') && argsObj.sendPush) {
             argsObj.push('stoppedStatus', 'false');
          }
       }

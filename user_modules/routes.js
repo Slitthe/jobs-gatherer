@@ -38,7 +38,9 @@ funcs.runAction = function(req, res, push) {
             push: push,
             sendPush: true
          });
+         console.log('Started');
       } else { // cancel the search
+         console.log('Stopped');
          search.run.cancel(push);
       }
       res.send(''); // send a blank susscesful response
@@ -242,7 +244,6 @@ var routes = function(app, push) {
    app.get('/debugging', function(req, res) {
       if (!data.appRunning.getValue()) {
          var queryList = [];
-         var queries = db.methods.collectionGetAll('vajlue', db.models);
          var queries = Object.keys(db.models);
          queries.forEach(function(query) {
             queryList.push(db.methods.collectionGetAll(query, db.models) );
@@ -275,7 +276,7 @@ var routes = function(app, push) {
    });
 
    app.delete('/debugging', function(req, res) {
-      let deleteList = req.body.deleteList || null;
+      let deleteList = req.body.items ? JSON.parse(req.body.items) : null;
       let promiseList = [];
       if(deleteList) {
          Object.keys(deleteList).forEach(function(currentModel) {
@@ -288,6 +289,7 @@ var routes = function(app, push) {
          res.status(500);
          res.send('failure');
       });
+
    });
 
 

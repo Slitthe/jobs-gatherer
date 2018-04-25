@@ -36,6 +36,7 @@ es.addEventListener('update', function (evt) {
 
    // ------- search service run state
 es.addEventListener('stoppedStatus', function (evt) {
+   console.log('TEST');
    if (evt.data === 'true') {
       $('.state-display .state-text').text('Stopped');
       $('.state-display').removeClass('led-green');
