@@ -20,9 +20,9 @@ var errorMessage = {
 // sends the request to delete the selected items
 var deleteSelected = function() {
    var   returnObj = {},
-         childrenChecks, typeEl, typeValue, types
+         childrenChecks, typeEl, typeValue, types;
          checkedLength = 0;
-         
+
    types = $('[data-name]');
    // splits the checked items by their corresponding DB model
    Array.prototype.forEach.call(types, function(type) {
