@@ -36,7 +36,85 @@ body {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* Settings */
+
+
+
+/* Start the app page */
    /* 'LED' running status */
 .led-green { color: rgba(40, 200, 70, 0.7); }
 .led-red { color: rgba(230, 70, 40, 0.7); }
@@ -64,7 +142,6 @@ body {
    background: rgba(77, 77, 77, 0.95);
    color: white;
 }
-
 .full-size-absolute {
    left: 0;
    right: 0;
@@ -79,7 +156,6 @@ body {
    box-sizing: border-box;
    line-height: 3em;
 }
-
 .checkbox-text:hover {
    cursor: pointer;
 }
@@ -88,6 +164,10 @@ body {
 
 
 
+
+
+
+/* Debugging */
 .data-container {
    border: 1px solid gray;
    cursor: pointer;
@@ -114,6 +194,7 @@ body {
 .data-container label {
    display: block;
    cursor: pointer;
+   margin-bottom: 0;
 }
 
 .to-delete-checkbox:checked + .checkbox-bg {
@@ -128,9 +209,14 @@ body {
    list-style-type: none;
    margin-top: 50px;
 }
-.data-container li {
+
+.data-container label {
    padding: 0.5em;
+
+}
+.data-container li {
    border: 1px solid rgb(64, 64, 64);
+   margin-bottom: 0.5em;
 }
 
 .text-bold {
@@ -181,20 +267,6 @@ body {
 
 
 
-@media screen and (max-width: 700px) {
-   .confirm-dialog-box {
-      left: 5%;
-      right: 5%;
-      padding: 1em 0.5em;
-   }
-}
-@media screen and (max-width: 1100px) {
-   .confirm-dialog-box {
-      left: 10%;
-      right: 10%;
-      padding: 2em 1em;
-   }
-}
 
 .close-dialog {
    font-size: 1.2em;
@@ -228,4 +300,17 @@ body {
    margin-bottom: 50px;
 }
 
-/* Start the app page */
+@media screen and (max-width: 700px) {
+   .confirm-dialog-box {
+      left: 5%;
+      right: 5%;
+      padding: 1em 0.5em;
+   }
+}
+@media screen and (max-width: 1100px) {
+   .confirm-dialog-box {
+      left: 10%;
+      right: 10%;
+      padding: 2em 1em;
+   }
+}

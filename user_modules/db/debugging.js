@@ -1,39 +1,25 @@
-const data = require('../data'),
-      methods = require('./methods'),
-      models = require('./models');
-
-let modelsKeys = Object.keys(models);
+const models = require('./models'),
+      modelsKeys = Object.keys(models);
       
-var deleteAll = function() {
-   modelsKeys.forEach(function(model) {
-      models[model].remove({}, function(err, data){});
-   });
-};
 
-var deleteCollection = function(modelName) {
-   if(modelsKeys.indexOf(modelName) !== -1) {
-      models[modelName].remove({}, function(err, data) {});
-   }
-};
 
 var deleteEntities = function(modelName, idsList) {
+   console.log(modelName, idsList);
+   // DB delete promise
    return new Promise(function(res, rej) {
       if (modelsKeys.indexOf(modelName) !== -1 && Array.isArray(idsList)) {
          idsList.forEach(function(id) {
             models[modelName].findByIdAndRemove(id, function(err, data){
-               if(!err) {
-                  res();
-               } else {
-                  rej();
-               }
+               if(!err) res();
+               else rej();
             });
          });
-      } else {
-         rej();
-      }
+      } 
+      else rej(); 
    });
 };
 
+// splits a site list of DB results by their locations
 var locationSplit = function (dataList, sites) {
    let splitByLocation = function(results) {
       var categorized = {};
@@ -58,8 +44,6 @@ var locationSplit = function (dataList, sites) {
 };
 
 module.exports = {
-   deleteAll: deleteAll,
-   deleteCollection: deleteCollection,
    deleteEntities: deleteEntities,
    locationSplit: locationSplit
 };

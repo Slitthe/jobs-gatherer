@@ -1,7 +1,7 @@
 // Contains any unique data needed to add a new site (parser, URL constructor and its name)
 
 let exportData = {};
-// The sites to search in, needs to match all the other variable names where they are also used
+// The sites to search in, needs to match all the other variable/prop names where they are also used
 exportData.sites = [
    'ejobs',
    'bestjobs'

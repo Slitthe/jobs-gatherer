@@ -16,7 +16,7 @@ const search = require('./search'),
     
 
 // ------------------------------------routes functions------------------------------------
-var funcs = {};
+var funcs = {}; // stores the routes methods
 
 // pause or resume the search functionality
 funcs.runAction = function(req, res, push) {
@@ -151,21 +151,23 @@ funcs.index = function(req, res) {
    }
 };
 
+// Show the page the sites selection takes place and the actual application is started
 funcs.startPage = function(req, res) {
    if (!data.appRunning.getValue()) {
-      // res.send('Select the sites to start the app');
-      res.render('start', { sites: sitesInfo.sites, error: false });
+      res.render('start', { sites: sitesInfo.sites});
    } else {
       res.render('app-running');
    }
 };
 
+// starts the application with the selected sites
 funcs.startAction = function(req, res, push) {
    inputSites = req.body.sites || null;
    if (!data.appRunning.getValue()) {
       if (inputSites) {
          inputSites = typeof inputSites === 'string' ? [inputSites] : inputSites;
          inputSites = Array.isArray(inputSites) ? inputSites : null;
+         // reuqest data validation
          if (helpers.isPartOfTheOther(inputSites, sitesInfo.sites)) {
             sitesInfo.sites = inputSites;
             data.appRunning.turnOn({
@@ -188,7 +190,7 @@ funcs.startAction = function(req, res, push) {
             res.send('error');
          }
       } else {
-         res.status(500);
+         res.status(400);
          res.send('error');
       }
    } else {
@@ -197,23 +199,69 @@ funcs.startAction = function(req, res, push) {
    }
 };
 
-function appRunningResponse(req, res, func, args) {
+// redirects to the '/start' page when the app isn't running
+funcs.appRunningResponse = function(req, res, func, args) {
    if(!data.appRunning.getValue()) {
       res.redirect('/start')
    } else {
       func.apply(this, args); 
    }
-}
+};
+
+// delete the selected ids list from the database
+funcs.deleteSelected = function (req, res) {
+   let deleteList = req.body.items ? JSON.parse(req.body.items) : null;
+   // gets rid of empty arrays
+   Object.keys(deleteList).forEach(function (item) {
+      if (!deleteList[item].length) {
+         delete deleteList[item];
+      }
+   });
+   let promiseList = [];
+   if (deleteList) {
+      // adds the deletion requests to the promise list
+      Object.keys(deleteList).forEach(function (currentModel) {
+         promiseList.push(db.debugging.deleteEntities(currentModel, deleteList[currentModel]));
+      });
+   }
+   // responds only when all of the deletions have been succesful
+   Promise.all(promiseList).then(function () {
+      res.send('success');
+   }).catch(function () {
+      res.status(500);
+      res.send('failure');
+   });
+};
+
+// show the actual debugging page
+funcs.debuggingPage = function(req, res) {
+   var queryList = [];
+   var queries = Object.keys(db.models);
+   // gets everything in the DB, all of the items of the models
+   queries.forEach(function (query) {
+      queryList.push(db.methods.collectionGetAll(query, db.models));
+   });
+
+   var promiseAll = Promise.all(queryList); // awaitis for the models items
+
+   promiseAll.then(function (dataList) { // renders the template on success
+      dataList = db.debugging.locationSplit(dataList, sitesInfo.sites);
+      res.render('debugging', { dataList: dataList, sites: sitesInfo.sites });
+   });
+   promiseAll.catch(function () {
+      res.status(500);
+      res.send('error');
+   });
+};
 
 
       
 // -----------------------------------app -> express; push -> server sent events-----------------------------------
 var routes = function(app, push) {
 
-
    // Home
 	app.get('/' ,function(req, res) {
-      appRunningResponse(req, res, function () {
+      funcs.appRunningResponse(req, res, function () {
          res.render('home', { sites: sitesInfo.sites });
       }, []);
    });
@@ -227,85 +275,54 @@ var routes = function(app, push) {
 
    // Settings
    app.get('/settings', function(req, res) {
-      appRunningResponse(req, res, function () {
+      console.log(search.run.isRunning);
+      funcs.appRunningResponse(req, res, function () {
          res.render('settings', { data: data, runState: search.run.isRunning, sites: sitesInfo.sites});
       }, []);
    });
    // stop/start the search
    app.post('/runAction', function(req, res) {
-      appRunningResponse(req, res, funcs.runAction, [req, res, push]);
+      funcs.appRunningResponse(req, res, funcs.runAction, [req, res, push]);
    });
 
    // add/remove a value
    app.put('/update', function (req, res) {
-      appRunningResponse(req, res, funcs.update, [req, res]);      
+      funcs.appRunningResponse(req, res, funcs.update, [req, res]);      
    });
 
+   // Show the Database debug page
    app.get('/debugging', function(req, res) {
       if (!data.appRunning.getValue()) {
-         var queryList = [];
-         var queries = Object.keys(db.models);
-         queries.forEach(function(query) {
-            queryList.push(db.methods.collectionGetAll(query, db.models) );
-         });
-
-         var promiseAll = Promise.all(queryList);
-
-         promiseAll.then(function(dataList) {
-            dataList = db.debugging.locationSplit(dataList, sitesInfo.sites);
-            res.render('debugging', {dataList: dataList, sites: sitesInfo.sites});
-         });
-
-         promiseAll.catch(function() {
-            res.send('error');
-         });
-         // query.then(function(data) {
-         //    res.send('Then');
-
-         //    // res.render('start', { sites: sitesInfo.sites, error: false });
-         // });
-
-         // query.catch(function() {
-         //    res.send('catch');
-
-         //    // res.redirect('/start');
-         // });
+         funcs.debuggingPage(req, res);
       } else {
          res.render('app-running');
       }
    });
 
+   // Delete the selected items from the DB
    app.delete('/debugging', function(req, res) {
-      let deleteList = req.body.items ? JSON.parse(req.body.items) : null;
-      let promiseList = [];
-      if(deleteList) {
-         Object.keys(deleteList).forEach(function(currentModel) {
-            promiseList.push( db.debugging.deleteEntities(currentModel, deleteList[currentModel]) );
-         });
+      if (!data.appRunning.getValue()) {
+         funcs.deleteSelected(req, res);
+      } else {
+         res.status(403);
+         res.status('App must be stopped in order to delete the items.')
       }
-      Promise.all(promiseList).then(function() {
-         res.send('success');
-      }).catch(function() {
-         res.status(500);
-         res.send('failure');
-      });
-
    });
 
 
    // update the category of a rersult
    app.put('/:site/:id', function(req, res) { 
-      appRunningResponse(req, res, funcs.catUpdate, [req, res]);            
+      funcs.appRunningResponse(req, res, funcs.catUpdate, [req, res]);            
    });
 
    // index page for the results, site specific
 	app.get('/:site', function(req, res) {
-      appRunningResponse(req, res, funcs.index, [req, res]);                  
+      funcs.appRunningResponse(req, res, funcs.index, [req, res]);                  
    });
 
    // generic 404 page
    app.get('*', function(req, res) {
-      appRunningResponse(req, res, function () {
+      funcs.appRunningResponse(req, res, function () {
          res.status(404);
          res.render('404');
       }, []);

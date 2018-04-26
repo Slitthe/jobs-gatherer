@@ -6,6 +6,7 @@
       <div class='container'>
          <h1 class='h2'>Select the sites to use</h1>
          <form action='/start' method='POST'>
+            <!-- Usable sites list -->
             <ul class='list-group'>
 
                <% sites.forEach(function(site) { %>
@@ -34,14 +35,12 @@
          </div>
 
          <hr>
-         <a href='/debugging' class='btn btn-info'>Database debugging</a>
+         
+         <nav>
+            <a href='/debugging' class='btn btn-info'>Database debugging</a>
+         </nav>
       </div>
    </main>
 
-
-
-   </div>
-
    <script src='/js/start.js'></script>
-
 <% include ./partials/footer %>

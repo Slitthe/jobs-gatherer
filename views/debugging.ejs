@@ -2,11 +2,12 @@
 <% title = 'Debugging Tools' %>
 <% include partials/header-bottom %>
 
-
+<!-- Delete button -->
 <div class='destructor display-inline-block'>
    <button class='btn btn-danger px-5 py-2'>Delete Selected</button>
 </div>
 
+<!-- Confirm dialog box -->
 <div class='confirm-dialog-box d-none'>
    <div class='close-dialog bg-danger position-absolute'>&times;</div>
    <form class='dialog-form' method='POST'>
@@ -18,106 +19,112 @@
 </div>
 
 <main class='mx-md-5 debugging-main'>
+
+   <!-- Internal navigation -->
    <nav class='mt-3'>
       <a href='/start' class='btn btn-info'>‹‹ Start the application</a>
    </nav>
    <hr>
+   <!-- Usage info / general info-->
    <aside class='info my-3 text-primary'>
       <p>Select the items you want to <span class='text-danger text-bold'>PERMANENTLY</span> delete from the database.</p>
       <p>Then, use the 'Delete Selected' button and confirm your decision.</p>
       <p><span class='text-muted'>Clicking on a container will select/unselect all of its children items.</span></p>
    </aside>
-<% dataList.forEach(function(currentData) { %>
-   <% for(let i = 0; i < sites.length; i++) { %>
-      <% if ( sites[i] === currentData.name ) { %>
-         <div class='top-level-data container-fluid data-container p-lg-5 p-md-4' data-name='<%=currentData.name%>' title='<%= currentData.name.toUpperCase()%>'>
-         <div class='container-info'>
-            <h2 class='h1'>Results: <%= currentData.name %></h2>
-            <div class='text-muted'>The results for each site and their respective location.</div>
-         </div>
-         <% let locationKeys = Object.keys(currentData.data) %>
-         <% locationKeys.forEach(function(currentKey) { %>
-            <ul class='container-fluid data-container p-lg-5 p-md-4 pt-5' title='<%=currentData.name.toUpperCase() + ': ' + currentKey%>'>
-            <div>
-               <h3 class='h2'>Location: <%= currentKey%></h3>
-            </div>
-               <% currentData.data[currentKey].forEach(function(singleData) { %>
-                  <label>
+
+   <!-- Items containers list -->
+   <% dataList.forEach(function(currentData) { %>
+      <% for(let i = 0; i < sites.length; i++) { %>
+         <% if ( sites[i] === currentData.name ) { %>
+         <!-- Site results -->
+            <section class='top-level-data container-fluid data-container p-lg-5 p-md-4' data-name='<%=currentData.name%>' title='<%= currentData.name.toUpperCase()%>'>
+               <div class='container-info'>
+                  <h2 class='h1'>Results: <%= currentData.name %></h2>
+                  <div class='text-muted'>The results for each site and their respective location.</div>
+               </div>
+               <% let locationKeys = Object.keys(currentData.data) %>
+               <% locationKeys.forEach(function(currentKey) { %>
+               <ul class='container-fluid data-container p-lg-5 p-md-4 pt-5' title='<%=currentData.name.toUpperCase() + ': ' + currentKey%>'>
+               <div>
+                  <h3 class='h2'>Location: <%= currentKey%></h3>
+               </div>
+                  <% currentData.data[currentKey].forEach(function(singleData) { %>
                      <li class='individual-result position-relative'>
-                        <input class='to-delete-checkbox d-none' type='checkbox' value='<%= singleData._id %>' name='delete'>
-                        <div class='position-absolute full-size-absolute checkbox-bg'></div>
-                        <div class='text-italic'><%= singleData.url %></div>
-                        <div class='text-bold'><%= singleData.title %></div>
+                        <label>
+                           <input class='to-delete-checkbox d-none' type='checkbox' value='<%= singleData._id %>' name='delete'>
+                           <div class='position-absolute full-size-absolute checkbox-bg'></div>
+                           <div class='text-italic'><%= singleData.url %></div>
+                           <div class='text-bold'><%= singleData.title %></div>
+                        </label>
                      </li>
-                  </label>
-               <% }) %>
-            </ul>
-         <% }) %>
+                  <% }) %>
+               </ul>
+            <% }) %>
+         <% } %>
+         </section>
       <% } %>
-      </div>
-   <% } %>
-<% }) %> 
+   <% }) %> 
 
-<% dataList.forEach(function(currentData) { %>
-   
-   <% if ( currentData.name === 'value' ) { %>
-      <div class='top-level-data container-fluid data-container p-lg-5 p-md-4' data-name='<%=currentData.name%>'>
-            <div class='container-info'>
-            <h2 class='h1'> Current search info </h2>
-            <div class='text-muted'>Current search parameters for each site. Their deletion will make the search start from the beginning.</div>
-         </div>
+   <% dataList.forEach(function(currentData) { %>
+      <!-- Current search data -->
+      <% if ( currentData.name === 'value' ) { %>
+         <section class='top-level-data container-fluid data-container p-lg-5 p-md-4' data-name='<%=currentData.name%>'>
+               <div class='container-info'>
+               <h2 class='h1'> Current search info </h2>
+               <div class='text-muted'>Current search parameters for each site. Their deletion will make the search start from the beginning.</div>
+            </div>
 
-      <ul class='container-fluid pt-5'>
-         <% currentData.data.forEach(function(singleData) { %>
-            <label>
-                <li class='individual-result position-relative'>
-                  <input class='to-delete-checkbox d-none' type='checkbox' value='<%= singleData._id %>' name='delete'>
-                  <div class='position-absolute full-size-absolute checkbox-bg'></div>
-                  <div class='text-bold'><span class='text-bold text-underline'>Site:</span> <%= singleData.site %></div>
-                  <div class='text-bold'><span class='text-bold text-underline'>Location:</span> <%= singleData.location %></div>
-                  <div><span class='text-bold text-underline'>Query:</span> <%= singleData.query %></div>
-                  <div><span class='text-bold text-underline'>Page:</span> <%= singleData.page %></div>
-               </li>
-            </label>
-          <% }) %>
-      </ul>
-
-   <% } %>
-   </div>
-
-<% }) %>
-
-
-<% dataList.forEach(function(currentData) { %>
-
-   <% if ( currentData.name === 'searchData' ) { %>
-      <div class='top-level-data container-fluid data-container p-lg-5 p-md-4' data-name='<%=currentData.name%>'>
-
-         <div class='container-info'>
-            <h2 class='h1'> Search parameters list </h2>
-            <div class='text-muted'>List of the search terms and the locations used in the requests.</div>
-         </div>
-
-
-         <% currentData.data.forEach(function(dataItem) { %>
-            <ul class='container-fluid pt-5'>
-               <h3 class='h2'>Type: <%= dataItem.type %></h3>
-               <label>
-                  <li class='individual-result position-relative'>
-                     <input class='to-delete-checkbox d-none' type='checkbox' value='<%= dataItem._id %>' name='delete'>
+         <ul class='container-fluid pt-5'>
+            <% currentData.data.forEach(function(singleData) { %>
+               <li class='individual-result position-relative'>
+                  <label>
+                     <input class='to-delete-checkbox d-none' type='checkbox' value='<%= singleData._id %>' name='delete'>
                      <div class='position-absolute full-size-absolute checkbox-bg'></div>
-                     <% dataItem.list.forEach(function(searchParam) { %>
-                        <div><%= searchParam %></div>
-                     <% }) %>
+                     <div class='text-bold'><span class='text-bold text-underline'>Site:</span> <%= singleData.site %></div>
+                     <div class='text-bold'><span class='text-bold text-underline'>Location:</span> <%= singleData.location %></div>
+                     <div><span class='text-bold text-underline'>Query:</span> <%= singleData.query %></div>
+                     <div><span class='text-bold text-underline'>Page:</span> <%= singleData.page %></div>
+                  </label>
+               </li>
+            <% }) %>
+         </ul>
+
+      <% } %>
+      </section>
+
+   <% }) %>
+
+
+   <% dataList.forEach(function(currentData) { %>
+      <!-- Serach list data -->
+      <% if ( currentData.name === 'searchData' ) { %>
+         <section class='top-level-data container-fluid data-container p-lg-5 p-md-4' data-name='<%=currentData.name%>'>
+
+            <div class='container-info'>
+               <h2 class='h1'> Search parameters list </h2>
+               <div class='text-muted'>List of the search terms and the locations used in the requests.</div>
+            </div>
+
+
+            <% currentData.data.forEach(function(dataItem) { %>
+               <ul class='container-fluid pt-5'>
+                  <h3 class='h2'>Type: <%= dataItem.type %></h3>
+                  <li class='individual-result position-relative'>
+                     <label>
+                        <input class='to-delete-checkbox d-none' type='checkbox' value='<%= dataItem._id %>' name='delete'>
+                        <div class='position-absolute full-size-absolute checkbox-bg'></div>
+                        <% dataItem.list.forEach(function(searchParam) { %>
+                           <div><%= searchParam %></div>
+                        <% }) %>
+                     </label>
                   </li>
-               </label>
-            </ul>
-         <% }) %>
+               </ul>
+            <% }) %>
 
-         </div>
-   <% } %>
+            </section>
+      <% } %>
 
-<% }) %> 
+   <% }) %> 
 </main>
 
 

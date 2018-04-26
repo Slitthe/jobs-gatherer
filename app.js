@@ -3,19 +3,10 @@
 const express = require('express'),
 		methodOverride = require('method-override'),
       bodyParser = require('body-parser'),
-      ssePusher = require('sse-pusher'),
-      request = require('request');
+      ssePusher = require('sse-pusher');
 
    // Own modules files
-const helpers = require('./user_modules/helpers'),
-      data = require('./user_modules/data'),
-      routes = require('./user_modules/routes'),
-      db =  {
-         methods: require('./user_modules/db/methods'),
-         models: require('./user_modules/db/models')
-      },
-      search = require('./user_modules/search'),
-      sitesInfo = require('./user_modules/sites');
+const routes = require('./user_modules/routes');
 
    // Dependencies initialization
 const push = ssePusher(),
