@@ -170,6 +170,7 @@ funcs.startAction = function(req, res, push) {
          // reuqest data validation
          if (helpers.isPartOfTheOther(inputSites, sitesInfo.sites)) {
             sitesInfo.sites = inputSites;
+            console.log('Just before appRunning turnOn is triggered');
             data.appRunning.turnOn({
                runner: search.starter,
                args: {
@@ -275,7 +276,6 @@ var routes = function(app, push) {
 
    // Settings
    app.get('/settings', function(req, res) {
-      console.log(search.run.isRunning);
       funcs.appRunningResponse(req, res, function () {
          res.render('settings', { data: data, runState: search.run.isRunning, sites: sitesInfo.sites});
       }, []);

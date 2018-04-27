@@ -98,12 +98,22 @@ function infiniteRepeat(argObj) {
       argObj.removeExpired(argObj.models, argObj.sitesInfo.sites); // remove any expired DB entries
       argObj.saveValues(params, argObj.models); // save indices of the search paramaters & current page to DB
 
-      var url = argObj.sitesInfo.getUrls(params.page, params.queries.getValue(), params.locations.getValue(), params.site); // create req URL
+      var url = argObj.sitesInfo.getUrls.reqUrls(params.page, params.queries.getValue(), params.locations.getValue(), params.site); // create req URL
 
       console.log(colors.cyan.bold('QUERY: ') + colors.underline(params.queries.getValue()) + colors.cyan.bold('   LOCATION: ') + colors.underline(params.locations.getValue()) + colors.cyan.bold('   PAGE:') + colors.underline(params.page), '   ' + colors.cyan.bold(params.site));
       console.log(colors.bold(url));
 
-      argObj.request(url, function (err, response, body) { // makes the request
+      let reqOptions = {
+         url: url,
+         headers: {
+            'User-Agent': 'request/2.85.0',
+            'Origin': 'http://localhost:3000',
+            'Accept': '*/*',
+            'Referer': 'http://localhost:3000/'
+         }
+      };
+
+      argObj.request(reqOptions, function (err, response, body) { // makes the request
          params.push('update', { // send a SSE for status update on the front-end
             query: params.queries.getValue(),
             location: params.locations.getValue(),
@@ -113,7 +123,7 @@ function infiniteRepeat(argObj) {
 
          if (!err && response.statusCode === 200) { // successful request
             params.tryCount = 1;
-            let   parsed = argObj.sitesInfo.parse({ str: body, site: params.site }); // parsed HTML response to extract the jobs listing (if any)
+            let parsed = argObj.sitesInfo.parse({ str: body, site: params.site }, argObj.sitesInfo.getUrls.baseUrls, params.queries.getValue()); // parsed HTML response to extract the jobs listing (if any)
             if (parsed) { // 1 or more results (otherwise parsed is null)
                argObj.addResults(
                   {
@@ -150,8 +160,8 @@ function infiniteRepeat(argObj) {
 
 // search run info and actions related start/stop actions
 var run = {
-   continue: true,
-   runTimeout: null, 
+   continue: false,
+   runTimeout: [], 
    cancel: function (push) { // cancels the search and notifies the front end via SSE
       this.continue = false;
       if (this.runTimeout.length) {
@@ -165,7 +175,6 @@ var run = {
       }
    },
    start: function (argsObj) { // starts the search and notifies the front end via SSE
-      this.runTimeout = [];
       if (!this.isRunning) {
          this.continue = true;
          argsObj.runner(argsObj.args);
@@ -174,8 +183,8 @@ var run = {
          }
       }
    },
-   get isRunning() { // get running state information
-      return !!(this.continue && this.runTimeout);
+   get isRunning() {
+      return !!(this.continue);
    }
 };
 
