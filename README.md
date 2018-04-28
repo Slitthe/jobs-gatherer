@@ -136,8 +136,6 @@ It is possible to add additional sites by manually defining in the `user_modules
 
 <br><br><br><br><br>
 ## **Front-end interaction**
-===========================
-
 
 ### **Interaction when first running the `app.js` file with node**
 <hr>
