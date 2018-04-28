@@ -18,7 +18,7 @@ exportData.parse = function () {
    // expressions used for parsing as a private variables in a function closure
    var expressions = function(query)
    {
-      var exps = {
+     var exps = {
          removeWs: /\n|\r?\n|\r/g, // remove whitespace so the RegExp won't need multi-line input
          ejobs: {
             items: /dataLayerItemLink.*?<\/a>/gi, // find the job results, the RegExp which captures each href and name for a job listing
@@ -59,13 +59,11 @@ exportData.parse = function () {
       htmlString = sls`${htmlString}?`; // remove white space (to not need to work multi-line in RegExp)
 
      var exp = expressions(query)[site]; // get the expressions object for the input site
-     console.log(htmlString);
       
       // Uses the 'items' expression to determine how many results are on the page
       if(exp.hasOwnProperty('wrappers')) { // for sites where the actual relevant results are in a specific wrapper
          exp.wrappers.forEach(function(wrapperExp) {
             // console.log('\n\n\n\n\n\n\n\n');
-            console.log(wrapperExp);
             let currentMatch = htmlString.match(wrapperExp);
             htmlString = currentMatch ? currentMatch[0] : '';
             // console.log(currentMatch);
@@ -115,7 +113,6 @@ exportData.getUrls = function (baseUrls) {
          bestjobs: urls.bestjobs + '/locuri-de-munca/relevant/' + page + '?keyword=' + query + '&location=' + location,
          hipo: urls.hipo + '/locuri-de-munca/cautajob/Toate-Domeniile/' + query + '/' + location + '/' + page,
          olx: urls.olx + '/locuri-de-munca/' + location + '/q-' + query + '?page=' + page
-         // https://www.olx.ro/locuri-de-munca/bacau/q-lucrator/?page=1
       };
       return siteUrls[site]; // result of the constructor for the input 'site'
    };

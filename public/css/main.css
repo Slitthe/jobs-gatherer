@@ -1,316 +1,191 @@
 /* General / Helpers */
-body {
-   padding-left: 10px;
-   padding-right: 10px;
-}
-   /* matches the margin of Bootstrap's 'row' class */
-.row-margin {
-   margin-left: -15px;
-   margin-right: -15px;
-}
-   /* Positions something absolutely to the right with a bit of spacing */
-.absolute-right {
-   right: 5px;
-   top: 5px;
-   bottom: 5px;
-   z-index: 999;
-}
+   body {
+      padding-left: 10px;
+      padding-right: 10px;
+   }
+   .row-margin { /* matches the margin of Bootstrap's 'row' class */
+      margin-left: -15px;
+      margin-right: -15px;
+   }
+
+   .absolute-right {
+      right: 5px;
+      top: 5px;
+      bottom: 5px;
+      z-index: 999;
+   }
+   .full-size-absolute {
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      position: absolute;
+   }
    /* general list-group-item(s) styling and for their different status */
-.list-group-item { padding: 0; }
-.list-group-item:hover { background: rgba(82%, 82%, 82%, 0.7); }
-.list-group-item:active { background: rgba(82%, 82%, 82%, 0.9); }
-.list-group-item:focus { background: rgba(87%, 87%, 87%, 0.95); }
+      .list-group-item { padding: 0; }
+      .list-group-item:hover { background: rgba(82%, 82%, 82%, 0.7); }
+      .list-group-item:active { background: rgba(82%, 82%, 82%, 0.9); }
+      .list-group-item:focus { background: rgba(87%, 87%, 87%, 0.95); }
+
+   /* text */
+      .text-bold { font-weight: bold; }
+      .text-italic { font-style: italic; }
+      .text-underline { text-decoration: underline; }
+/* ------------ */
+
+
+
 
 /* Index page */
-.result-item {
-   display: block;
-   width: 100%;
-   padding: 0.75rem 1.25rem;
-   padding-right: 7rem;
-   transition-property: background;
-   transition-duration: 0.05s;
-   box-sizing: border-box;
-}
-.result-type { margin-bottom: 150px; }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+   .result-item {
+      display: block;
+      width: 100%;
+      padding: 0.75rem 1.25rem;
+      padding-right: 7rem;
+      transition-property: background;
+      transition-duration: 0.05s;
+      box-sizing: border-box;
+   }
+   .result-type { margin-bottom: 150px; }
+/*----------------*/
 
 
 
 
 /* Settings */
+   /* search status display */
+      .led-green { color: rgba(40, 200, 70, 0.7); }
+      .led-red { color: rgba(230, 70, 40, 0.7); }
+      .led-green .led-body { background-color: rgba(40, 200, 70, 0.7); }
+      .led-red .led-body { background-color: rgba(230, 70, 40, 0.7); }
+      .led, .led-body { display: inline-block; }
+      .led-body {
+         margin-left: 1em;
+         width: 1em;
+         height: 1em;
+         border-radius: 50%;
+         box-shadow: inset 0 0 0.6em 0.2em rgba(80, 80, 80, 0.5), 0 0 0.5em 0 currentColor;
+      }
+   /* live search status highlight */
+      [data-status] { transition: 0.7s all linear; }
+      .current-search-item { background: pink; }
+/* ---------------- */
+
+
 
 
 
 /* Start the app page */
-   /* 'LED' running status */
-.led-green { color: rgba(40, 200, 70, 0.7); }
-.led-red { color: rgba(230, 70, 40, 0.7); }
-.led-green .led-body { background-color: rgba(40, 200, 70, 0.7); }
-.led-red .led-body { background-color: rgba(230, 70, 40, 0.7); }
-.led, .led-body { display: inline-block; }
-.led-body {
-   margin-left: 1em;
-	width: 1em;
-	height: 1em;
-	border-radius: 50%;
-	box-shadow: inset 0 0 0.6em 0.2em rgba(80, 80, 80, 0.5), 0 0 0.5em 0 currentColor;
-}
-[data-status] { 
-   transition: 0.7s all linear; 
-}
-
-/* Select sites and start the app itself page */
-.current-search-item {
-   background: pink;
-}
-
-.checkbox-input + .checkbox-text { background: transparent; }
-.checkbox-input:checked + .checkbox-text {
-   background: rgba(77, 77, 77, 0.95);
-   color: white;
-}
-.full-size-absolute {
-   left: 0;
-   right: 0;
-   top: 0;
-   bottom: 0;
-   position: absolute;
-}
-
-.checkbox-list-item {
-   padding: 1.5em;
-   height: 0;
-   box-sizing: border-box;
-   line-height: 3em;
-}
-.checkbox-text:hover {
-   cursor: pointer;
-}
-
-
-
-
-
+   .checkbox-input + .checkbox-text { background: transparent; }
+   .checkbox-input:checked + .checkbox-text {
+      background: rgba(77, 77, 77, 0.95);
+      color: white;
+   }
+   .checkbox-list-item {
+      padding: 1.5em;
+      height: 0;
+      box-sizing: border-box;
+      line-height: 3em;
+   }
+   .checkbox-text:hover {
+      cursor: pointer;
+   }
+/* --------------- */
 
 
 
 /* Debugging */
-.data-container {
-   border: 1px solid gray;
-   cursor: pointer;
-   word-wrap: break-word;
-}
-.top-margin-space {
-      margin-top: 90px;
-}
+   /* General/containers/headings */
+      .debugging-main { /* contains all of the .top-level-data containers */
+         margin-top: 150px;
+         margin-bottom: 50px;
+      }
+      .top-level-data { margin-top: 100px; } /* the topmost container of that category which contains the corresponding results */
+      .data-container { /* container where the results (or group of results) are */
+         border: 1px solid gray;
+         cursor: pointer;
+         word-wrap: break-word;
+      }
+      .debugging-main .h1 { text-decoration: underline; }
+      .debugging-main .h2, .debugging-main .h3 { text-align: center;}
+      .debugging-main .h2 {
+         background: gray;
+         color: white;
+         padding: 0.2em 0.1em;
+      }
+      .data-container:hover { background: rgba(0,0,0,0.2); }
+      /* --------------- */
+      
+      
+      
+      
+   /* Individual items & their main wrappers */
+      .data-container ul {
+         list-style-type: none;
+         margin-top: 50px;
+      }
+      .data-container li {
+         border: 1px solid rgb(64, 64, 64);
+         margin-bottom: 0.5em;
+      }
+      .data-container label {
+         display: block;
+         cursor: pointer;
+         margin-bottom: 0;
+         padding: 0.5em;
+      }
+      .individual-result:hover { background: rgba(0,0,0,0.45); }
+      .to-delete-checkbox:checked + .checkbox-bg {
+         background: rgba(0,0,0,0.7);
+         z-index: -1;
+      }
+      .to-delete-checkbox:checked ~ * { color: rgb(200, 200, 200);}
+   /* ------------ */
 
-.data-container:hover {
-   background: rgba(0,0,0,0.15);
-}
+   /* Delete & confirm dialog box */
+      .destructor { /* delete button */
+         position: fixed;
+         right: 15px;
+         bottom: 15px;
+         z-index: 20;
+      }
+      .confirm-dialog-box { /* dialog wrapper */
+         z-index: 20;
+         position: fixed;
+         top: 20px;
+         left: 20%;
+         right: 20%;
+         padding: 2em 5em;
+         background: gray;
+         border-radius: 10px;
+         text-align: center;
+      }
+      .close-dialog {
+         font-size: 1.2em;
+         right: 0;
+         top: 0;
+         background: white;
+         padding:0 1em;
+         border-bottom-left-radius: 5px;
+         font-weight: bold; 
+         color: white;
+         cursor: pointer;
+      }
+      .error-message:empty { display: none; }
+      @media screen and (max-width: 700px) {
+         .confirm-dialog-box {
+            left: 5%;
+            right: 5%;
+            padding: 1em 0.5em;
+         }
+      }
+      @media screen and (max-width: 1100px) {
+         .confirm-dialog-box {
+            left: 10%;
+            right: 10%;
+            padding: 2em 1em;
+         }
+      }
+   /* --------------------------- */
 
-.data-container > .data-container:hover {
-   background: rgba(0,0,0,0.23);
-}
-.data-container > .data-container > .data-container:hover {
-   background: rgba(0,0,0,0.35);
-}
-.individual-result:hover {
-   background: rgba(0,0,0,0.45);
-}
-
-.data-container label {
-   display: block;
-   cursor: pointer;
-   margin-bottom: 0;
-}
-
-.to-delete-checkbox:checked + .checkbox-bg {
-   background: rgba(0,0,0,0.7);
-   z-index: -1;
-}
-.to-delete-checkbox:checked ~ * {
-   color: rgb(200, 200, 200);
-}
-
-.data-container ul {
-   list-style-type: none;
-   margin-top: 50px;
-}
-
-.data-container label {
-   padding: 0.5em;
-
-}
-.data-container li {
-   border: 1px solid rgb(64, 64, 64);
-   margin-bottom: 0.5em;
-}
-
-.text-bold {
-   font-weight: bold;
-}
-.text-italic {
-   font-style: italic;
-}
-.text-underline {
-   text-decoration: underline;
-}
-
-.destructor {
-   position: fixed;
-   right: 15px;
-   bottom: 15px;
-   z-index: 20;
-}
-
-.confirm-dialog-box {
-   z-index: 20;
-   position: fixed;
-   top: 20px;
-   left: 20%;
-   right: 20%;
-   padding: 2em 5em;
-   background: gray;
-   border-radius: 10px;
-}
-
-.confirm-dialog-box {
-   text-align: center;
-}
-.top-level-data {
-   margin-top: 100px;
-}
-
-
-.dialog-input-container {
-   width: 100%;
-   max-width: 1000px;
-   margin: 0 auto;
-   display: block;
-}
-.dialog-input-container input {
-   width: 100%
-}
-
-
-
-
-.close-dialog {
-   font-size: 1.2em;
-   right: 0;
-   top: 0;
-   background: white;
-   padding:0 1em;
-   border-bottom-left-radius: 5px;
-   font-weight: bold; 
-   color: white;
-   cursor: pointer;
-}
-
-.debugging-main .h1 {
-   text-decoration: underline;
-
-}
-.debugging-main .h2 {
-  background: gray;
-  color: white;
-  padding: 0.2em 0.1em;
-}
-.debugging-main .h2, .debugging-main .h3 {
-  text-align: center;
-}
-.error-message:empty {
-   display: none;
-}
-.debugging-main {
-   margin-top: 150px;
-   margin-bottom: 50px;
-}
-
-@media screen and (max-width: 700px) {
-   .confirm-dialog-box {
-      left: 5%;
-      right: 5%;
-      padding: 1em 0.5em;
-   }
-}
-@media screen and (max-width: 1100px) {
-   .confirm-dialog-box {
-      left: 10%;
-      right: 10%;
-      padding: 2em 1em;
-   }
-}
+/* --------------------- END OF DEBUGGING*/
