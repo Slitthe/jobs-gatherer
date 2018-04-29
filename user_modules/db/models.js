@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
       data = require('../data'),
       sitesInfo = require('../sites');
 
-mongoose.connect('mongodb://localhost/jobs_gatherer_demo');
+mongoose.connect('mongodb://localhost/jobs_gatherer');
 
 var models = function() {
    // Mongoose Schemas
