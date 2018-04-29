@@ -74,7 +74,7 @@ Site searches run in parallel.
 ## **How to start it:**
 
 ### Using a VM
---  Using Virtualbox (or other virtualization application that supports importing `.ova` files) and then importing [this](https://drive.google.com/file/d/13OkllXMF1u-B3QuwBk3hEH94XRbx9Igo/view) VM (Used Lubuntu x64 16, has NodeJS and MongoDB already installed) then following the instructions on the desktop (which are in a file in the desktop, `~/Desktop/`).
+--  Using Virtualbox (or other virtualization application that supports importing `.ova` files) and then importing [this](https://drive.google.com/file/d/11J9z0EpzJkL5eD3dex3MYlZ2N2Xw8g6b/view) VM (Used Lubuntu x64 16, has NodeJS and MongoDB already installed) then following the instructions on the desktop (which are in a file in the desktop, `~/Desktop/`).
 
 ### In your own OS
 -- make sure you have **NodeJS,** **MongoDB** and **git** installed
