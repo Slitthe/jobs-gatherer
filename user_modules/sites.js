@@ -27,7 +27,8 @@ exportData.parse = function () {
          },
          bestjobs: {
             items: /job-title.*?<\/a>/gi,
-            href: /href="(.*?)\"/gi,
+            href: /href="(.*?)\?.*?\"/gi,
+            // href: /href="(.*?)?\"/gi,
             name: /<strong.*?>(.*?)<\/strong>/gi
          },
          hipo: {
